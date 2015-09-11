@@ -57,6 +57,7 @@ typedef usbh_mem_size_t mem_size_t;
 #define LWIP_DBG_LEVEL_SERIOUS      0
 #define LWIP_DBG_LEVEL_SEVERE      0
 #define S16_F         "d"
+#define ERR_OK 0
 
 #define LWIP_ASSERT(message, assertion) do { if(!(assertion)) \
   printf(message); } while(0)
@@ -67,6 +68,7 @@ typedef usbh_mem_size_t mem_size_t;
                                  printf("\r\n");\
                                } \
                              } while(0)
+
 
                           
 #endif
@@ -101,7 +103,10 @@ static __inline signed char sys_mutex_lock(sys_mutex_t *mu)
 //    printf("sys_mutex_lock %d  ",err);
 //    OSSemPend(mu,0,OS_OPT_PEND_BLOCKING,0,&err);
     if(err != OS_ERR_NONE)
+    {
+        printf("memory_middle.h: sys_mutex_lock error:%d\r\n",err);
         return -1;
+    }
     else
         return 0;    
 }
@@ -112,7 +117,10 @@ static __inline signed char sys_mutex_unlock(sys_mutex_t *mu)
     OSSchedUnlock(&err);
 //    printf("sys_mutex_unlock %d\r\n",err);
     if((err != OS_ERR_NONE)&&(err != OS_ERR_SCHED_LOCKED))
+    {
+        printf("memory_middle.h: sys_mutex_unlock error:%d\r\n",err);
         return -1;
+    }
     else
         return 0;    
 }

@@ -2,7 +2,7 @@
 #define _KTHREAD_H
 #include "list.h"
 #include "os.h"
-#include "misc_cvt.h"
+//#include "misc_cvt.h"
 #include "fs_cvt.h"
 
 /*

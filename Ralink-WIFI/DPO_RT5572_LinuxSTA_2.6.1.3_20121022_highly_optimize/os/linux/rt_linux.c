@@ -1927,7 +1927,7 @@ NDIS_STATUS AdapterBlockAllocateMemory(IN PVOID handle,
 			 ("packet> cb offset = %lu\n", RTPktOffsetCB));
 	}
 #endif /* OS_ABL_FUNC_SUPPORT */
-    printk("sizeof(RTMP_ADAPTER):%d",sizeof(RTMP_ADAPTER));
+
 /*	*ppAd = (PVOID)vmalloc(sizeof(RTMP_ADAPTER)); //pci_alloc_consistent(pci_dev, sizeof(RTMP_ADAPTER), phy_addr); */
 #ifdef HIGHLY_OPTIMIZE
 	*ppAd = (PVOID)&_adapter;

@@ -4,7 +4,7 @@
 #include "lwip/dhcp.h"
 #include "wlan_ethernetif.h"
 #include "shell.h"
-
+#include "wlan.h"
 
  
 /*Static IP ADDRESS: IP_ADDR0.IP_ADDR1.IP_ADDR2.IP_ADDR3 */

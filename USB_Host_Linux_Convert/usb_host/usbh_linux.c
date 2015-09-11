@@ -1,4 +1,4 @@
-#define USBH_DEBUG_LEVEL USBH_DEBUG_TRACE
+#define USBH_DEBUG_LEVEL USBH_DEBUG_ERROR//USBH_DEBUG_TRACE
 
 #include "os.h"
 #include "usbh_config.h"

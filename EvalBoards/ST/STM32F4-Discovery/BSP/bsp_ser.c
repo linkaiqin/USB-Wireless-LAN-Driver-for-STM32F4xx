@@ -50,7 +50,7 @@
 *                                            LOCAL DEFINES
 *********************************************************************************************************
 */
-//#define USE_DMA_PRINTF
+//#define USE_BUF_PRINTF
 
 
 #define  BSP_SER_PRINTF_STR_BUF_SIZE             80u
@@ -61,8 +61,9 @@
 
 static BSP_OS_SEM   BSP_SerTxWait;
 static BSP_OS_SEM   BSP_SerRxWait;
+#ifdef USE_BUF_PRINTF
 static BSP_OS_SEM BSP_SerTxBufWait;
-
+#endif
 
 
 BSP_OS_SEM   BSP_SerLock;
@@ -101,10 +102,10 @@ static CPU_INT08U rx_buffer[SERIAL_RX_BUFFER_SIZE];
 *********************************************************************************************************
 */
 
-
+#ifdef USE_BUF_PRINTF
 static BUFFER_INFO tx_buf_ring;
 static CPU_INT08U tx_buffer[SERIAL_TX_BUFFER_SIZE];
-
+#endif
 
 
 
@@ -187,7 +188,7 @@ void  BSP_Ser_Init ()
 
 
 
-#ifdef USE_DMA_PRINTF
+#ifdef USE_BUF_PRINTF
     Buf_init(&tx_buf_ring,tx_buffer,sizeof(tx_buffer));
     BSP_OS_SemCreate(&BSP_SerTxBufWait,   0, "BSP_SerTxBufWait");
 #endif
@@ -246,7 +247,7 @@ void  BSP_Ser_ISR_Handler (void)
 #define FINSH_USING_HISTORY
 #define FINSH_HISTORY_LINES 5
 #define FINSH_CMD_SIZE      80
-#define FINSH_PROMPT      "finsh>>"
+#define FINSH_PROMPT      ">"
 #define rt_kprintf printf
 #define rt_strlen strlen
 #define rt_malloc(size) kmalloc(size,0)
@@ -434,8 +435,10 @@ void Ser_RxTask(void)
 {
     CPU_INT08U ret;
     char ch;
-    OS_PEND_DATA  pend_data_tbl[2];
     OS_ERR err;
+#ifdef USE_BUF_PRINTF    
+    OS_PEND_DATA  pend_data_tbl[2];
+#endif    
 //    SHELL_ERR err;
 //    RX_CALLBACK call_back;
 //    void *p_arg;
@@ -447,7 +450,7 @@ void Ser_RxTask(void)
 
     while(1)
     {
-#ifdef USE_DMA_PRINTF
+#ifdef USE_BUF_PRINTF
         pend_data_tbl[0].PendObjPtr = (OS_PEND_OBJ *)&BSP_SerTxBufWait;
         pend_data_tbl[1].PendObjPtr = (OS_PEND_OBJ *)&BSP_SerRxWait;
         OSPendMulti(pend_data_tbl, 2, 0, OS_OPT_PEND_BLOCKING, &err);
@@ -713,7 +716,7 @@ void Ser_RxTask(void)
 
 void  BSP_Ser_WrByteUnlocked (CPU_INT08U c)
 {
-#ifdef USE_DMA_PRINTF
+#ifdef USE_BUF_PRINTF
     putchar(c);
 #else
     USART_SendData(USART2, c);
@@ -842,13 +845,12 @@ void _ttywrch(int ch)
 }
 
 int fputc(int ch, FILE *f)
-{
+{   
+#ifdef USE_BUF_PRINTF
     CPU_INT08U ret;
     OS_ERR err;
     CPU_SR cpu_sr;
-
-
-#ifdef USE_DMA_PRINTF
+    
     CPU_CRITICAL_ENTER();
 
     if(ch == '\n')

@@ -5,7 +5,14 @@
 //#include <linux/poison.h>
 //#include <linux/prefetch.h>
 //#include <asm/system.h>
-#include "misc_cvt.h"
+//#include "misc_cvt.h"
+
+
+#define offset_of(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+
+#define container_of(obj, type, memb) \
+	((type *)(((char *)obj) - offset_of(type, memb)))
+
 /********** include/linux/list.h **********/
 /*
  * These are non-NULL pointers that will result in page faults

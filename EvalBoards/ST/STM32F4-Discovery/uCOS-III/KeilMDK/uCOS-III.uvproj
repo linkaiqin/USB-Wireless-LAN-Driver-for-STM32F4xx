@@ -334,7 +334,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>3</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
@@ -347,10 +347,11 @@
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
             <VariousControls>
-              <MiscControls>--gnu -DHIGHLY_OPTIMIZE -DMEMORY_OPTIMIZATION -DMLMEQUEUE_ALLOC_INUSE -DSYSTEM_LOG_SUPPORT -DVENDOR_FEATURE2_SUPPORT -DAGGREGATION_SUPPORT -DPIGGYBACK_SUPPORT -DLINUX -DRT28xx_MODE=STA -DCHIPSET=3070 -DCONFIG_RA_NAT_NONE -DCONFIG_STA_SUPPORT -DDBG -DDOT11_N_SUPPORT -DDOT11N_DRAFT3 -DSTATS_COUNT_SUPPORT -DLED_CONTROL_SUPPORT -DRTMP_MAC_USB -DRTMP_USB_SUPPORT -DRTMP_TIMER_TASK_SUPPORT -DA_BAND_SUPPORT -DRTMP_MAC_USB -DRTMP_USB_SUPPORT -DRTMP_TIMER_TASK_SUPPORT -DRTMP_RF_RW_SUPPORT -DA_BAND_SUPPORT -DVCORECAL_SUPPORT -DRTMP_MAC_USB -DRTMP_USB_SUPPORT -DRTMP_TIMER_TASK_SUPPORT -DRTMP_RF_RW_SUPPORT -DA_BAND_SUPPORT -DDOT11N_SS3_SUPPORT -DVCORECAL_SUPPORT -DNEW_MBSSID_MODE -DRTMP_FREQ_CALIBRATION_SUPPORT -DRTMP_MAC_USB -DRT5390 -DRTMP_USB_SUPPORT -DRTMP_TIMER_TASK_SUPPORT -DRTMP_RF_RW_SUPPORT -DRTMP_INTERNAL_TX_ALC -DRTMP_FREQ_CALIBRATION_SUPPORT -DVCORECAL_SUPPORT -DRTMP_TEMPERATURE_COMPENSATION -DNEW_MBSSID_MODE -DRTMP_MAC_USB -DRTMP_USB_SUPPORT -DRTMP_RF_RW_SUPPORT -DRTMP_TIMER_TASK_SUPPORT -DA_BAND_SUPPORT -DVCORECAL_SUPPORT -DRTMP_TEMPERATURE_COMPENSATION -DRTMP_FREQ_CALIBRATION_SUPPORT -DRT30xx -DRT3070</MiscControls>
+              <MiscControls>--gnu -DHIGHLY_OPTIMIZE -DMEMORY_OPTIMIZATION -DMLMEQUEUE_ALLOC_INUSE -DVENDOR_FEATURE2_SUPPORT -DAGGREGATION_SUPPORT -DPIGGYBACK_SUPPORT -DWMM_SUPPORT -DLINUX -DSYSTEM_LOG_SUPPORT -DRT28xx_MODE=STA -DCHIPSET=5572 -DCONFIG_RA_NAT_NONE -DCONFIG_STA_SUPPORT -DDBG -DDOT11_N_SUPPORT -DDOT11N_DRAFT3 -DSTATS_COUNT_SUPPORT -DLED_CONTROL_SUPPORT -DRTMP_MAC_USB -DRTMP_USB_SUPPORT -DRT2870 -DRT28xx -DRTMP_TIMER_TASK_SUPPORT -DA_BAND_SUPPORT -DRTMP_MAC_USB -DRTMP_USB_SUPPORT -DRT2870 -DRT28xx -DRT30xx -DRT35xx -DRT3572 -DRTMP_TIMER_TASK_SUPPORT -DRTMP_RF_RW_SUPPORT -DRTMP_EFUSE_SUPPORT -DA_BAND_SUPPORT -DVCORECAL_SUPPORT -DRTMP_MAC_USB -DRTMP_USB_SUPPORT -DRT30xx -DRT35xx -DRT3593 -DRT3573 -DRTMP_TIMER_TASK_SUPPORT -DRTMP_RF_RW_SUPPORT -DRTMP_EFUSE_SUPPORT -DA_BAND_SUPPORT -DDOT11N_SS3_SUPPORT -DVCORECAL_SUPPORT -DNEW_MBSSID_MODE -DRTMP_FREQ_CALIBRATION_SUPPORT -DRTMP_MAC_USB -DRT30xx -DRT33xx -DRT3070 -DRT3370 -DRT5370 -DRTMP_USB_SUPPORT -DRTMP_TIMER_TASK_SUPPORT -DRTMP_RF_RW_SUPPORT -DRTMP_EFUSE_SUPPORT -DRTMP_INTERNAL_TX_ALC -DRTMP_FREQ_CALIBRATION_SUPPORT -DVCORECAL_SUPPORT -DRTMP_TEMPERATURE_COMPENSATION -DNEW_MBSSID_MODE -DRTMP_MAC_USB -DRTMP_USB_SUPPORT -DRT30xx -DRT5572 -DRT5592 -DRTMP_RF_RW_SUPPORT -DRTMP_EFUSE_SUPPORT -DRTMP_TIMER_TASK_SUPPORT -DA_BAND_SUPPORT -DVCORECAL_SUPPORT -DRTMP_TEMPERATURE_COMPENSATION -DRTMP_FREQ_CALIBRATION_SUPPORT
+</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,HSE_VALUE=8000000,USE_FULL_ASSERT,USE_USB_OTG_FS,USE_EMBEDDED_PHY</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\uCOS-III;..\..\BSP;..\..\..\..\..\uC-CPU;..\..\..\..\..\uC-CPU\ARM-Cortex-M4\RealView;..\..\..\..\..\uC-LIB;..\..\..\..\..\uC-LIB\Ports\ARM-Cortex-M4\RealView;..\..\..\..\..\uCOS-III\Source;..\..\..\..\..\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView;..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\inc;..\..\BSP\ST\CMSIS\Device\ST\STM32F4xx\Include;..\..\BSP\OS\uCOS-III;..\..\BSP\ST\STM32_USB_OTG_Driver\inc;..\..\BSP\ST\USB_Host_Linux_Convert;..\..\BSP\ST\USB_Host_Linux_Convert\object;..\..\BSP\memory;..\..\..\..\..\Ralink-WIFI\DPO_RT5572_LinuxSTA_2.6.1.3_20121022_highly_optimize\include;..\..\..\..\..\uC-Shell\Source;..\..\..\..\..\lwip-1.4.1\src\include;..\..\..\..\..\lwip-1.4.1\src\include\ipv4;..\..\..\..\..\lwip-1.4.1\port;..\..\..\..\..\lwip-1.4.1\port\Standalone;..\..\..\..\..\uC-TTCP\Source;..\..\..\..\..\uC-Probe\Target\Communication\Generic\Source;..\..\..\..\..\uC-Probe\Target\Communication\Generic\TCPIP\Source;..\App\src;..\..\..\..\..\ff10a\src;..\..\..\..\..\lwip-ftpd-master;..\App\src\shell;..\..\..\..\..\uC-GUI\inc;..\..\..\..\..\iperf\include</IncludePath>
+              <IncludePath>..\..\uCOS-III;..\..\BSP;..\..\..\..\..\uC-CPU;..\..\..\..\..\uC-CPU\ARM-Cortex-M4\RealView;..\..\..\..\..\uC-LIB;..\..\..\..\..\uC-LIB\Ports\ARM-Cortex-M4\RealView;..\..\..\..\..\uCOS-III\Source;..\..\..\..\..\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView;..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\inc;..\..\BSP\ST\CMSIS\Device\ST\STM32F4xx\Include;..\..\BSP\OS\uCOS-III;..\..\..\..\..\Ralink-WIFI\DPO_RT5572_LinuxSTA_2.6.1.3_20121022_highly_optimize\include;..\..\..\..\..\uC-Shell\Source;..\..\..\..\..\lwip-1.4.1\src\include;..\..\..\..\..\lwip-1.4.1\src\include\ipv4;..\..\..\..\..\lwip-1.4.1\port;..\..\..\..\..\lwip-1.4.1\port\Standalone;..\..\..\..\..\iperf\include;..\..\..\..\..\USB_Host_Linux_Convert\usb_host;..\..\..\..\..\USB_Host_Linux_Convert\usb_host\STM32_USB_OTG_Driver\inc;..\..\..\..\..\USB_Host_Linux_Convert\memory;..\..\..\..\..\USB_Host_Linux_Convert\object;..\App\src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -494,12 +495,12 @@
             <File>
               <FileName>mem_cvt.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\memory\mem_cvt.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\memory\mem_cvt.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_ser2.c</FileName>
+              <FileName>bsp_ser.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\bsp_ser2.c</FilePath>
+              <FilePath>..\..\BSP\bsp_ser.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1029,82 +1030,72 @@
             <File>
               <FileName>usbh_core.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\usbh_core.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbh_ioreq.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\usbh_ioreq.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbh_linux.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\usbh_linux.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbh_stdreq.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\usbh_stdreq.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\usbh_core.c</FilePath>
             </File>
             <File>
               <FileName>usbh_hcs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\usbh_hcs.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\usbh_hcs.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_ioreq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\usbh_ioreq.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_linux.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\usbh_linux.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_stdreq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\usbh_stdreq.c</FilePath>
             </File>
             <File>
               <FileName>atomic.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\object\atomic.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\atomic.c</FilePath>
             </File>
             <File>
               <FileName>complete.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\object\complete.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\complete.c</FilePath>
             </File>
             <File>
               <FileName>fs_cvt.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\object\fs_cvt.c</FilePath>
-            </File>
-            <File>
-              <FileName>misc_cvt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\object\misc_cvt.c</FilePath>
-            </File>
-            <File>
-              <FileName>net_cvt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\object\net_cvt.c</FilePath>
-            </File>
-            <File>
-              <FileName>sem.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\object\sem.c</FilePath>
-            </File>
-            <File>
-              <FileName>spinlock.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\object\spinlock.c</FilePath>
-            </File>
-            <File>
-              <FileName>tasklet.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\object\tasklet.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\fs_cvt.c</FilePath>
             </File>
             <File>
               <FileName>kthread.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\object\kthread.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\kthread.c</FilePath>
+            </File>
+            <File>
+              <FileName>misc_cvt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\misc_cvt.c</FilePath>
+            </File>
+            <File>
+              <FileName>net_cvt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\net_cvt.c</FilePath>
+            </File>
+            <File>
+              <FileName>sem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\sem.c</FilePath>
+            </File>
+            <File>
+              <FileName>tasklet.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\tasklet.c</FilePath>
             </File>
             <File>
               <FileName>timer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\object\timer.c</FilePath>
-            </File>
-            <File>
-              <FileName>thread.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\USB_Host_Linux_Convert\object\thread.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\timer.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1114,17 +1105,17 @@
             <File>
               <FileName>usb_core.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32_USB_OTG_Driver\src\usb_core.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\STM32_USB_OTG_Driver\src\usb_core.c</FilePath>
             </File>
             <File>
               <FileName>usb_hcd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32_USB_OTG_Driver\src\usb_hcd.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\STM32_USB_OTG_Driver\src\usb_hcd.c</FilePath>
             </File>
             <File>
               <FileName>usb_hcd_int.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32_USB_OTG_Driver\src\usb_hcd_int.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\STM32_USB_OTG_Driver\src\usb_hcd_int.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1150,6 +1141,41 @@
               <FileName>rtmp_chip.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\Ralink-WIFI\DPO_RT5572_LinuxSTA_2.6.1.3_20121022_highly_optimize\chips\rtmp_chip.c</FilePath>
+            </File>
+            <File>
+              <FileName>rt28xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\Ralink-WIFI\DPO_RT5572_LinuxSTA_2.6.1.3_20121022_highly_optimize\chips\rt28xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>rt33xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\Ralink-WIFI\DPO_RT5572_LinuxSTA_2.6.1.3_20121022_highly_optimize\chips\rt33xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>rt35xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\Ralink-WIFI\DPO_RT5572_LinuxSTA_2.6.1.3_20121022_highly_optimize\chips\rt35xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>rt3290.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\Ralink-WIFI\DPO_RT5572_LinuxSTA_2.6.1.3_20121022_highly_optimize\chips\rt3290.c</FilePath>
+            </File>
+            <File>
+              <FileName>rt3370.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\Ralink-WIFI\DPO_RT5572_LinuxSTA_2.6.1.3_20121022_highly_optimize\chips\rt3370.c</FilePath>
+            </File>
+            <File>
+              <FileName>rt3593.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\Ralink-WIFI\DPO_RT5572_LinuxSTA_2.6.1.3_20121022_highly_optimize\chips\rt3593.c</FilePath>
+            </File>
+            <File>
+              <FileName>rt5592.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\Ralink-WIFI\DPO_RT5572_LinuxSTA_2.6.1.3_20121022_highly_optimize\chips\rt5592.c</FilePath>
             </File>
           </Files>
         </Group>

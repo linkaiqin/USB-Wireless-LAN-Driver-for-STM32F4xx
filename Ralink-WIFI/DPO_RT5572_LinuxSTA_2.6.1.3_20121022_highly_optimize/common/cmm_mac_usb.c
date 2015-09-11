@@ -802,7 +802,7 @@ Note:
 HTTX_BUFFER __HTTXContext_Buffer;
 TX_BUFFER __NullContext_Buffer;
 TX_BUFFER __PSContext_Buffer;
-unsigned char __RxContext_Buffer[MAX_RXBULK_SIZE];
+unsigned char __RxContext_Buffer[RX_RING_SIZE*MAX_RXBULK_SIZE];
 #endif
 
 
@@ -837,7 +837,7 @@ NDIS_STATUS NICInitRecv(
             goto out1;
         }
 #ifdef HIGHLY_OPTIMIZE
-        pRxContext->TransferBuffer = &__RxContext_Buffer[0];
+        pRxContext->TransferBuffer = &__RxContext_Buffer[i*MAX_RXBULK_SIZE];
         pRxContext->data_dma = NULL;
 #else
         /* Allocate transfer buffer*/

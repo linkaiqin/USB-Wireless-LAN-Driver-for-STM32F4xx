@@ -155,6 +155,7 @@
 
     #include <memory.h>
 
+//    #define IPERF_DEBUG   1
 
     /* Disable some unneeded/unimplemented features */
     #ifndef NO_SIGNALS
@@ -238,7 +239,7 @@
     #include <math.h>
 
 
-#define fprintf(...)    
+// #define fprintf(...)    
 #define exit(x)   while(1)  
 #define malloc(size)  kmalloc(size, 0)
 #define free kfree

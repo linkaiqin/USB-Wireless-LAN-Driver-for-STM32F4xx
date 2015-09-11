@@ -139,17 +139,12 @@ void TaskCreateHook(OS_TCB *p_tcb)
 }
 
 
-#define USBH_DEBUG_LEVEL  USBH_DEBUG_TRACE
-#include "usbh_config.h"
+
 #include "usbh_core.h"
-// #include "misc_cvt.h"
-#include "rt_config.h"
+#include "memory.h"
 #include "shell.h"
 #include "wlan.h"
 #include "lwip/tcpip.h"
-
-
-
 
 
 extern CPU_INT16S iwpriv_main (CPU_INT16U argc,
@@ -157,33 +152,10 @@ extern CPU_INT16S iwpriv_main (CPU_INT16U argc,
                                SHELL_OUT_FNCT out_fnct,
                                SHELL_CMD_PARAM *pcmd_param);
 
-
-static SHELL_CMD iw_shell_cmd[] =
-{
-  {"iwpriv", iwpriv_main},
-  {0, 0 }
-};
+extern void iperf_init(void);
 
 
 
-
-
-// void DoTask()
-// {
-//     printf("DoTask....\r\n");
-
-//     wireless_exec_cmd("iw_list scanning");
-
-//     wireless_exec_cmd("iw_priv set NetworkType=Infra");
-
-//     wireless_exec_cmd("iw_priv set AuthMode=WPA2PSK");
-
-//     wireless_exec_cmd("iw_priv set EncrypType=AES");
-
-//     wireless_exec_cmd("iw_priv set SSID=NetWork_Main");
-
-//     wireless_exec_cmd("iw_priv set WPAPSK=guodanian");
-// }
 
 
 
@@ -238,15 +210,15 @@ static  void  AppTaskStart (void *p_arg)
     usbh_mem_init();
 #endif
 
-    USBH_Init();
 
+
+    USBH_Init();
+    Shell_CmdTblAdd("iwpriv", (SHELL_CMD[]){{"iwpriv", iwpriv_main},{0, 0 }}, &err);
+
+    
    
     iperf_init();
     
-    
-    Shell_CmdTblAdd("iwpirv", iw_shell_cmd, &err);
-
-
 
     Ser_RxTask();
 
@@ -271,20 +243,13 @@ void assert_failed(uint8_t *file, uint32_t line)
 void dump_tcblist()
 {
     OS_TCB *p_tcb;
-    int i;
 
-    for(i = 0; i < TCBListIndex; i++)
+    p_tcb = OSTaskDbgListPtr;
+    while(p_tcb)
     {
-        p_tcb = TCBListTbl[TCBListIndex];
         printf("taskname:%s  StkSize:%d  StkUsed:%d\r\n",p_tcb->NamePtr,p_tcb->StkSize,p_tcb->StkUsed);
+        p_tcb = p_tcb->DbgNextPtr;
     }
-
-//     p_tcb = OSTaskDbgListPtr;
-//     while(p_tcb)
-//     {
-//         printf("taskname:%s  StkSize:%d  StkUsed:%d\r\n",p_tcb->NamePtr,p_tcb->StkSize,p_tcb->StkUsed);
-//         p_tcb = OSTaskDbgListPtr->DbgNextPtr;
-//     }
 }
 
 extern struct net_device *_pnet_device;
@@ -357,7 +322,7 @@ void hard_fault_handler_c (unsigned int * hardfault_args)
     printf ("SCB_SHCSR = %x\r\n", SCB->SHCSR);
 
     printf("output_nest_ctr:%d\r\n",output_nest_ctr);
-    printf("usb_nperiod_task_req_num:%d urb_nperiod_queue.num:%d max_num:%d\r\n",_usb_device.usb_nperiod_task_req_num,_usb_device.urb_nperiod_queue.num,_usb_device.urb_nperiod_queue.max_num_record);
+//    printf("usb_nperiod_task_req_num:%d urb_nperiod_queue.num:%d max_num:%d\r\n",_usb_device.usb_nperiod_task_req_num,_usb_device.urb_nperiod_queue.num,_usb_device.urb_nperiod_queue.max_num_record);
     printf("OSIntNestingCtr:%d  OSSchedLockNestingCtr:%d CPU_IntDisNestCtr:%d\r\n",OSIntNestingCtr,OSSchedLockNestingCtr,CPU_IntDisNestCtr);
     printf("OSTCBCurPtr->NamePtr = %s StkSize:%d  StkUsed:%d\r\n",OSTCBCurPtr->NamePtr,OSTCBCurPtr->StkSize,OSTCBCurPtr->StkUsed);
     printf("total task:%d\r\n",TCBListIndex);
@@ -391,80 +356,4 @@ void hard_fault_handler_c (unsigned int * hardfault_args)
 
 }
 
-
-
-// #define VENDOR_FEATURE2_SUPPORT
-// #define AGGREGATION_SUPPORT
-// #define PIGGYBACK_SUPPORT
-// //#define WMM_SUPPORT
-// #define LINUX
-// //#define SYSTEM_LOG_SUPPORT
-// #define RT28xx_MODE=STA
-// #define CHIPSET=5572
-// #define CONFIG_RA_NAT_NONE
-// #define CONFIG_STA_SUPPORT
-// #define DBG
-// #define DOT11_N_SUPPORT
-// //#define DOT11N_DRAFT3
-// #define STATS_COUNT_SUPPORT
-// #define LED_CONTROL_SUPPORT
-// #define RTMP_MAC_USB
-// #define RTMP_USB_SUPPORT
-// #define RT2870
-// #define RT28xx
-// #define RTMP_TIMER_TASK_SUPPORT
-// #define A_BAND_SUPPORT
-// #define RTMP_MAC_USB
-// #define RTMP_USB_SUPPORT
-// #define RT2870
-// #define RT28xx
-// #define RT30xx
-// #define RT35xx
-// #define RT3572
-// #define RTMP_TIMER_TASK_SUPPORT
-// #define RTMP_RF_RW_SUPPORT
-// #define RTMP_EFUSE_SUPPORT
-// #define A_BAND_SUPPORT
-// #define VCORECAL_SUPPORT
-// #define RTMP_MAC_USB
-// #define RTMP_USB_SUPPORT
-// #define RT30xx
-// #define RT35xx
-// #define RT3593
-// #define RT3573
-// #define RTMP_TIMER_TASK_SUPPORT
-// #define RTMP_RF_RW_SUPPORT
-// #define RTMP_EFUSE_SUPPORT
-// #define A_BAND_SUPPORT
-// #define DOT11N_SS3_SUPPORT
-// #define VCORECAL_SUPPORT
-// #define NEW_MBSSID_MODE
-// #define RTMP_FREQ_CALIBRATION_SUPPORT
-// #define RTMP_MAC_USB
-// #define RT30xx
-// #define RT33xx
-// #define RT3070
-// #define RT3370
-// #define RT5370
-// #define RTMP_USB_SUPPORT
-// #define RTMP_TIMER_TASK_SUPPORT
-// #define RTMP_RF_RW_SUPPORT
-// #define RTMP_EFUSE_SUPPORT
-// #define RTMP_INTERNAL_TX_ALC
-// #define RTMP_FREQ_CALIBRATION_SUPPORT
-// #define VCORECAL_SUPPORT
-// #define RTMP_TEMPERATURE_COMPENSATION
-// #define NEW_MBSSID_MODE
-// #define RTMP_MAC_USB
-// #define RTMP_USB_SUPPORT
-// #define RT30xx
-// #define RT5572
-// #define RT5592
-// #define RTMP_RF_RW_SUPPORT
-// #define RTMP_EFUSE_SUPPORT
-// #define RTMP_TIMER_TASK_SUPPORT
-// #define A_BAND_SUPPORT
-// #define VCORECAL_SUPPORT
-// #define RTMP_TEMPERATURE_COMPENSATION
-// #define RTMP_FREQ_CALIBRATION_SUPPORT
 

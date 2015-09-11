@@ -21,7 +21,7 @@ extern "C" {
 
 #ifndef USE_LWIP_MALLOC
 
-#define USBH_MEM_SIZE                (255*1024)
+#define USBH_MEM_SIZE                (24*1024)
 #define USBH_MEM_DEBUG                       1
 #define USBH_MEM_USE_POOLS                   0
 
