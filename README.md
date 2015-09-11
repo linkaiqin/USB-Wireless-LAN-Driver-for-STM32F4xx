@@ -6,7 +6,6 @@
 行速度。
 
 本软件特性：
-
 1.支持热插拔
 
 2.支持WEP、WPAPSK-AES、WPAPSK-TKIP、WPA2PSK-AES、WPA2PSK-TKIP等认证和加密方式
