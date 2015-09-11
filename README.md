@@ -1,15 +1,16 @@
 #USB Wireless LAN for STM32F4xx
 
-±¾Èí¼þÊ¹ÓÃuC/OS-III×÷ÎªÇ¶ÈëÊ½²Ù×÷ÏµÍ³£¬lwip×÷ÎªÍøÂçÐ­ÒéÕ»£¬STM32F4xx×÷Îª
-Î¢´¦ÀíÆ÷£¬ÒÆÖ²ÁËÁª·¢¿ÆµÄUSBÎÞÏßÍø¿¨Çý¶¯DPO_RT5572_LinuxSTA_2.6.1.3_20121022£¬
-²¢Õë¶ÔÇ¶ÈëÊ½ÏµÍ³×öÁËÓÅ»¯¡£²âÊÔ¹ý³Ì¿ÉÒÔ´ïµ½2.97MbitsµÄÉÏÐÐËÙ¶È,2.04MbitsµÄÏÂ
-ÐÐËÙ¶È¡£
+æœ¬è½¯ä»¶ä½¿ç”¨uC/OS-IIIä½œä¸ºåµŒå…¥å¼æ“ä½œç³»ç»Ÿï¼Œlwipä½œä¸ºç½‘ç»œåè®®æ ˆï¼ŒSTM32F4xxä½œä¸º  
+å¾®å¤„ç†å™¨ï¼Œç§»æ¤äº†è”å‘ç§‘çš„USBæ— çº¿ç½‘å¡é©±åŠ¨DPO_RT5572_LinuxSTA_2.6.1.3_20121022ï¼Œ  
+å¹¶é’ˆå¯¹åµŒå…¥å¼ç³»ç»Ÿåšäº†ä¼˜åŒ–ã€‚æµ‹è¯•è¿‡ç¨‹å¯ä»¥è¾¾åˆ°2.97Mbitsçš„ä¸Šè¡Œé€Ÿåº¦,2.04Mbitsçš„ä¸‹  
+è¡Œé€Ÿåº¦ã€‚
 
-±¾Èí¼þÌØÐÔ£º
-1.Ö§³ÖÈÈ²å°Î
-2.Ö§³ÖWEP¡¢WPAPSK-AES¡¢WPAPSK-TKIP¡¢WPA2PSK-AES¡¢WPA2PSK-TKIPµÈÈÏÖ¤ºÍ¼ÓÃÜ·½Ê½
-3	Ö§³Ö802.11b/g/n
-4.Ê¹ÓÃiwpriv¹¤¾ß¶ÔÎÞÏßÍø¿¨½øÐÐÅäÖÃ
-5.²âÊÔ¹ýµÄUSBÎÞÏßÍø¿¨ÐÍºÅRT3070
+æœ¬è½¯ä»¶ç‰¹æ€§ï¼š  
+1.æ”¯æŒçƒ­æ’æ‹”  
+2.æ”¯æŒWEPã€WPAPSK-AESã€WPAPSK-TKIPã€WPA2PSK-AESã€WPA2PSK-TKIPç­‰è®¤è¯å’ŒåŠ å¯†æ–¹å¼  
+3.æ”¯æŒ802.11b/g/n  
+4.ä½¿ç”¨iwprivå·¥å…·å¯¹æ— çº¿ç½‘å¡è¿›è¡Œé…ç½®  
+5.æµ‹è¯•è¿‡çš„USBæ— çº¿ç½‘å¡åž‹å·RT3070  
 
-ÓÐ¹ØÑÝÊ¾Àý×ÓºÍ¸ü¶à°ïÖú¼û Doc\USB Wireless LAN for STM32F4xx Doc.pdf
+
+æœ‰å…³æ¼”ç¤ºä¾‹å­å’Œæ›´å¤šå¸®åŠ©è§ Doc\USB Wireless LAN for STM32F4xx Doc.pdf
