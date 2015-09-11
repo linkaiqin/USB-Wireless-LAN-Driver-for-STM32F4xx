@@ -7,13 +7,9 @@
 
 本软件特性：
 1.支持热插拔
-
 2.支持WEP、WPAPSK-AES、WPAPSK-TKIP、WPA2PSK-AES、WPA2PSK-TKIP等认证和加密方式
-
 3.支持802.11b/g/n
-
 4.使用iwpriv工具对无线网卡进行配置
-
 5.测试过的USB无线网卡型号RT3070
 
 
