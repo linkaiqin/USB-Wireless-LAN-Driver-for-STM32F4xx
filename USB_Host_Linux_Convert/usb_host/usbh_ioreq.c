@@ -25,11 +25,11 @@
   ******************************************************************************
   */ 
 /* Includes ------------------------------------------------------------------*/
-
+#include "os.h"
+#include "usb_hcd.h"
+#include "usbh_debug.h"
+#include "usbh_linux.h"
 #include "usbh_ioreq.h"
-
-#include "usbh_hcs.h"
-#include "usbh_config.h"
 /** @addtogroup USBH_LIB
   * @{
   */
@@ -86,39 +86,43 @@
   * @param  hc_num: Host channel Number
   * @retval Status
   */
-USBH_Status USBH_CtlSendData ( USB_OTG_CORE_HANDLE *pdev, 
+int USBH_CtlSendData (struct usb_device *dev, 
                                 uint8_t *buff, 
                                 uint16_t length,
-                                uint8_t hc_num)
+                                struct usb_host_channel *ch)
 {
-    if(hc_num >= HC_MAX )
+
+//    printf("USBH_CtlSendData length:%d\r\n",length);
+    if(ch->hc_num >= USBH_CHANNEL_MAX)
     {
-        USBH_DBG("USBH_CtlSendData hc_num:%d out of range\r\n",hc_num);
-        return USBH_FAIL;
+        usb_halt(dev,"USBH_CtlSendData hc_num:%d out of range\r\n",ch->hc_num);
+    }
+
+    if(dev->USB_OTG_Core->host.hc[ch->hc_num].ep_is_in != 0)
+    {
+        dev->USB_OTG_Core->host.hc[ch->hc_num].ep_is_in = 0;
+        USB_OTG_HC_Init(dev->USB_OTG_Core, ch->hc_num);  
     }
     
-  pdev->host.hc[hc_num].ep_is_in = 0;
-  pdev->host.hc[hc_num].xfer_buff = buff;
-  pdev->host.hc[hc_num].xfer_len = length;
+  dev->USB_OTG_Core->host.hc[ch->hc_num].xfer_buff = buff;
+  dev->USB_OTG_Core->host.hc[ch->hc_num].xfer_len = length;
  
   if ( length == 0 )
   { /* For Status OUT stage, Length==0, Status Out PID = 1 */
-    pdev->host.hc[hc_num].toggle_out = 1;   
+    usb_settoggle(dev, dev->USB_OTG_Core->host.hc[ch->hc_num].ep_num, 1, 1);
   }
  
  /* Set the Data Toggle bit as per the Flag */
-  if ( pdev->host.hc[hc_num].toggle_out == 0)
+  if (usb_gettoggle(dev, dev->USB_OTG_Core->host.hc[ch->hc_num].ep_num, 1) == 0)
   { /* Put the PID 0 */
-      pdev->host.hc[hc_num].data_pid = HC_PID_DATA0;    
+      dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_DATA0;    
   }
  else
  { /* Put the PID 1 */
-      pdev->host.hc[hc_num].data_pid = HC_PID_DATA1 ;
+      dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_DATA1 ;
  }
 
-  HCD_SubmitRequest (pdev , hc_num);   
-   
-  return USBH_OK;
+  return HCD_SubmitRequest (dev->USB_OTG_Core , ch);   
 }
 
 
@@ -131,27 +135,47 @@ USBH_Status USBH_CtlSendData ( USB_OTG_CORE_HANDLE *pdev,
   * @param  hc_num: Host channel Number
   * @retval Status. 
   */
-USBH_Status USBH_CtlReceiveData(USB_OTG_CORE_HANDLE *pdev, 
+int USBH_CtlReceiveData(struct usb_device *dev, 
                                 uint8_t* buff, 
                                 uint16_t length,
-                                uint8_t hc_num)
+                                struct usb_host_channel *ch)
 {
-    if(hc_num >= HC_MAX )
+//    printf("USBH_CtlReceiveData length:%d\r\n",length);
+    if(ch->hc_num >= USBH_CHANNEL_MAX)
     {
-        USBH_DBG("USBH_CtlReceiveData hc_num:%d out of range\r\n",hc_num);
-        return USBH_FAIL;
+        usb_halt(dev,"hc_num:%d out of range\r\n",ch->hc_num);
+    }
+    
+    if(dev->USB_OTG_Core->host.hc[ch->hc_num].ep_is_in != 1)
+    {
+        dev->USB_OTG_Core->host.hc[ch->hc_num].ep_is_in = 1;
+        USB_OTG_HC_Init(dev->USB_OTG_Core, ch->hc_num);  
     }
 
-  pdev->host.hc[hc_num].ep_is_in = 1;
-  pdev->host.hc[hc_num].data_pid = HC_PID_DATA1;
-  pdev->host.hc[hc_num].xfer_buff = buff;
-  pdev->host.hc[hc_num].xfer_len = length;  
+  if (length == 0 )
+  { /* For Status IN stage, Length==0, Status IN PID = 1 */
+    usb_settoggle(dev, dev->USB_OTG_Core->host.hc[ch->hc_num].ep_num, 0, 1);
+  }
 
-  HCD_SubmitRequest (pdev , hc_num);   
+
+  if (usb_gettoggle(dev, dev->USB_OTG_Core->host.hc[ch->hc_num].ep_num, 0) == 0)
+  { /* Put the PID 0 */
+       dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_DATA0;    
+  }
+  else
+  { /* Put the PID 1 */
+       dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_DATA1 ;
+  }
+
+  dev->USB_OTG_Core->host.hc[ch->hc_num].xfer_buff = buff;
+  dev->USB_OTG_Core->host.hc[ch->hc_num].xfer_len = length;  
+
+    
   
-  return USBH_OK;
+  return HCD_SubmitRequest (dev->USB_OTG_Core , ch);
   
 }
+
 
 
 /**
@@ -163,32 +187,38 @@ USBH_Status USBH_CtlReceiveData(USB_OTG_CORE_HANDLE *pdev,
   * @param  hc_num: Host channel Number
   * @retval Status
   */
-USBH_Status USBH_BulkSendData ( USB_OTG_CORE_HANDLE *pdev, 
+int USBH_BulkIntSendData (struct usb_device *dev, 
                                 uint8_t *buff, 
                                 uint16_t length,
-                                uint8_t hc_num)
+                                struct usb_host_channel *ch)
 { 
-    if(hc_num >= HC_MAX )
+    if(ch->hc_num >= USBH_CHANNEL_MAX)
     {
-        USBH_DBG("USBH_BulkSendData hc_num:%d out of range\r\n",hc_num);
-        return USBH_FAIL;
+        usb_halt(dev,"hc_num:%d out of range\r\n",ch->hc_num);
     }
-  pdev->host.hc[hc_num].ep_is_in = 0;
-  pdev->host.hc[hc_num].xfer_buff = buff;
-  pdev->host.hc[hc_num].xfer_len = length;  
+  dev->USB_OTG_Core->host.hc[ch->hc_num].ep_is_in = 0;
+  dev->USB_OTG_Core->host.hc[ch->hc_num].xfer_buff = buff;
+  dev->USB_OTG_Core->host.hc[ch->hc_num].xfer_len = length;  
+  if(dev->USB_OTG_Core->host.hc[ch->hc_num].ep_type == EP_TYPE_INTR)
+  {
+    int max = dev->USB_OTG_Core->host.hc[ch->hc_num].max_packet;
+    dev->USB_OTG_Core->host.hc[ch->hc_num].multi_count = (length + max - 1)/max;
+  }
 
+  
  /* Set the Data Toggle bit as per the Flag */
-  if ( pdev->host.hc[hc_num].toggle_out == 0)
+  if (usb_gettoggle(dev, dev->USB_OTG_Core->host.hc[ch->hc_num].ep_num, 1) == 0)
   { /* Put the PID 0 */
-      pdev->host.hc[hc_num].data_pid = HC_PID_DATA0;    
+      dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_DATA0;    
   }
  else
  { /* Put the PID 1 */
-      pdev->host.hc[hc_num].data_pid = HC_PID_DATA1 ;
+      dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_DATA1 ;
  }
 
-  HCD_SubmitRequest (pdev , hc_num);   
-  return USBH_OK;
+//    printf("USBH_BulkIntSendData data_pid:%d\r\n",pdev->host.hc[hc_num].data_pid);
+    
+  return HCD_SubmitRequest (dev->USB_OTG_Core, ch);   
 }
 
 
@@ -201,108 +231,58 @@ USBH_Status USBH_BulkSendData ( USB_OTG_CORE_HANDLE *pdev,
   * @param  hc_num: Host channel Number
   * @retval Status. 
   */
-USBH_Status USBH_BulkReceiveData( USB_OTG_CORE_HANDLE *pdev, 
+int USBH_BulkIntReceiveData(struct usb_device *dev, 
                                 uint8_t *buff, 
                                 uint16_t length,
-                                uint8_t hc_num)
+                                struct usb_host_channel *ch)
 {
-    if(hc_num >= HC_MAX )
+    if(ch->hc_num >= USBH_CHANNEL_MAX)
     {
-        USBH_DBG("USBH_BulkReceiveData hc_num:%d out of range\r\n",hc_num);
-        return USBH_FAIL;
+        USBH_DBG("USBH_BulkReceiveData hc_num:%d out of range\r\n",ch->hc_num);
+        return -1;
     }    
-  pdev->host.hc[hc_num].ep_is_in = 1;   
-  pdev->host.hc[hc_num].xfer_buff = buff;
-  pdev->host.hc[hc_num].xfer_len = length;
-  
-
-  if( pdev->host.hc[hc_num].toggle_in == 0)
+  dev->USB_OTG_Core->host.hc[ch->hc_num].ep_is_in = 1;   
+  dev->USB_OTG_Core->host.hc[ch->hc_num].xfer_buff = buff;
+  dev->USB_OTG_Core->host.hc[ch->hc_num].xfer_len = length;
+  if(dev->USB_OTG_Core->host.hc[ch->hc_num].ep_type == EP_TYPE_INTR)
   {
-    pdev->host.hc[hc_num].data_pid = HC_PID_DATA0;
+    int max = dev->USB_OTG_Core->host.hc[ch->hc_num].max_packet;
+    dev->USB_OTG_Core->host.hc[ch->hc_num].multi_count = (length + max - 1)/max;
+  }  
+
+  if(usb_gettoggle(dev, dev->USB_OTG_Core->host.hc[ch->hc_num].ep_num, 0) == 0)
+  {
+    dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_DATA0;
   }
   else
   {
-    pdev->host.hc[hc_num].data_pid = HC_PID_DATA1;
+    dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_DATA1;
   }
 
-  HCD_SubmitRequest (pdev , hc_num);  
-  return USBH_OK;
+  return HCD_SubmitRequest (dev->USB_OTG_Core, ch);
 }
 
 
-/**
-  * @brief  USBH_InterruptReceiveData
-  *         Receives the Device Response to the Interrupt IN token
-  * @param  pdev: Selected device
-  * @param  buff: Buffer pointer in which the response needs to be copied
-  * @param  length: Length of the data to be received
-  * @param  hc_num: Host channel Number
-  * @retval Status. 
-  */
-USBH_Status USBH_InterruptReceiveData( USB_OTG_CORE_HANDLE *pdev, 
+int USBH_IsocSendData(struct usb_device *dev, 
                                 uint8_t *buff, 
-                                uint8_t length,
-                                uint8_t hc_num)
-{
-
-  pdev->host.hc[hc_num].ep_is_in = 1;  
-  pdev->host.hc[hc_num].xfer_buff = buff;
-  pdev->host.hc[hc_num].xfer_len = length;
+                                uint32_t length,
+                                struct usb_host_channel *ch)
+{ 
+  int multi = (length + dev->USB_OTG_Core->host.hc[ch->hc_num].max_packet - 1) \
+                    /dev->USB_OTG_Core->host.hc[ch->hc_num].max_packet;  
   
-
-  
-  if(pdev->host.hc[hc_num].toggle_in == 0)
-  {
-    pdev->host.hc[hc_num].data_pid = HC_PID_DATA0;
-  }
+  dev->USB_OTG_Core->host.hc[ch->hc_num].ep_is_in = 0;  
+  dev->USB_OTG_Core->host.hc[ch->hc_num].xfer_buff = buff;
+  dev->USB_OTG_Core->host.hc[ch->hc_num].xfer_len = length;
+  dev->USB_OTG_Core->host.hc[ch->hc_num].multi_count = multi;
+  //if mult is more than one, we can sure usb device is in DMA mode.See usb_submit_urb()
+  if(multi == 1)
+    dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_DATA0;
   else
-  {
-    pdev->host.hc[hc_num].data_pid = HC_PID_DATA1;
-  }
-
-  /* toggle DATA PID */
-  pdev->host.hc[hc_num].toggle_in ^= 1;  
+    dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_MDATA;    
   
-  HCD_SubmitRequest (pdev , hc_num);  
-  
-  return USBH_OK;
+  return HCD_SubmitRequest (dev->USB_OTG_Core, ch);  
 }
-
-/**
-  * @brief  USBH_InterruptSendData
-  *         Sends the data on Interrupt OUT Endpoint
-  * @param  pdev: Selected device
-  * @param  buff: Buffer pointer from where the data needs to be copied
-  * @param  length: Length of the data to be sent
-  * @param  hc_num: Host channel Number
-  * @retval Status. 
-  */
-USBH_Status USBH_InterruptSendData( USB_OTG_CORE_HANDLE *pdev, 
-                                uint8_t *buff, 
-                                uint8_t length,
-                                uint8_t hc_num)
-{
-
-  pdev->host.hc[hc_num].ep_is_in = 0;  
-  pdev->host.hc[hc_num].xfer_buff = buff;
-  pdev->host.hc[hc_num].xfer_len = length;
-  
-  if(pdev->host.hc[hc_num].toggle_in == 0)
-  {
-    pdev->host.hc[hc_num].data_pid = HC_PID_DATA0;
-  }
-  else
-  {
-    pdev->host.hc[hc_num].data_pid = HC_PID_DATA1;
-  }
-
-  pdev->host.hc[hc_num].toggle_in ^= 1;  
-  
-  HCD_SubmitRequest (pdev , hc_num);  
-  
-  return USBH_OK;
-}
-
 
 
 
@@ -315,47 +295,28 @@ USBH_Status USBH_InterruptSendData( USB_OTG_CORE_HANDLE *pdev,
   * @param  hc_num: Host channel Number
   * @retval Status. 
   */
-USBH_Status USBH_IsocReceiveData( USB_OTG_CORE_HANDLE *pdev, 
+int USBH_IsocReceiveData(struct usb_device *dev, 
                                 uint8_t *buff, 
                                 uint32_t length,
-                                uint8_t hc_num)
+                                struct usb_host_channel *ch)
 {    
+  int multi = (length + dev->USB_OTG_Core->host.hc[ch->hc_num].max_packet - 1) \
+                    /dev->USB_OTG_Core->host.hc[ch->hc_num].max_packet;  
   
-  pdev->host.hc[hc_num].ep_is_in = 1;  
-  pdev->host.hc[hc_num].xfer_buff = buff;
-  pdev->host.hc[hc_num].xfer_len = length;
-  pdev->host.hc[hc_num].data_pid = HC_PID_DATA0;
-  
+  dev->USB_OTG_Core->host.hc[ch->hc_num].ep_is_in = 1;  
+  dev->USB_OTG_Core->host.hc[ch->hc_num].xfer_buff = buff;
+  dev->USB_OTG_Core->host.hc[ch->hc_num].xfer_len = length;
+  dev->USB_OTG_Core->host.hc[ch->hc_num].multi_count = multi;
+  if(multi == 1)
+    dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_DATA0;
+  else if(multi == 2)
+    dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_DATA1;  
+  else //multi == 3
+    dev->USB_OTG_Core->host.hc[ch->hc_num].data_pid = HC_PID_DATA2;  
 
-  HCD_SubmitRequest (pdev , hc_num);  
-  
-  return USBH_OK;
+  return HCD_SubmitRequest (dev->USB_OTG_Core, ch);  
 }
 
-/**
-  * @brief  USBH_IsocSendData
-  *         Sends the data on Isochronous OUT Endpoint
-  * @param  pdev: Selected device
-  * @param  buff: Buffer pointer from where the data needs to be copied
-  * @param  length: Length of the data to be sent
-  * @param  hc_num: Host channel Number
-  * @retval Status. 
-  */
-USBH_Status USBH_IsocSendData( USB_OTG_CORE_HANDLE *pdev, 
-                                uint8_t *buff, 
-                                uint32_t length,
-                                uint8_t hc_num)
-{
-  
-  pdev->host.hc[hc_num].ep_is_in = 0;  
-  pdev->host.hc[hc_num].xfer_buff = buff;
-  pdev->host.hc[hc_num].xfer_len = length;
-  pdev->host.hc[hc_num].data_pid = HC_PID_DATA0;
-  
-  HCD_SubmitRequest (pdev , hc_num);  
-  
-  return USBH_OK;
-}
 
 /**
 * @}

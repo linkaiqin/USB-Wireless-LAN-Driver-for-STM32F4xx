@@ -326,6 +326,9 @@ CHAR RTMP_GetTxPwr(
 	return CurTxPwr;
 }
 
+#ifdef HIGHLY_OPTIMIZE
+MEASURE_REQ_TAB __MeasureReqTab;
+#endif
 
 NDIS_STATUS	MeasureReqTabInit(
 	IN PRTMP_ADAPTER pAd)
@@ -335,7 +338,11 @@ NDIS_STATUS	MeasureReqTabInit(
 	NdisAllocateSpinLock(pAd, &pAd->CommonCfg.MeasureReqTabLock);
 
 /*	pAd->CommonCfg.pMeasureReqTab = kmalloc(sizeof(MEASURE_REQ_TAB), GFP_ATOMIC);*/
+#ifdef HIGHLY_OPTIMIZE
+    pAd->CommonCfg.pMeasureReqTab = &__MeasureReqTab;
+#else
 	os_alloc_mem(pAd, (UCHAR **)&(pAd->CommonCfg.pMeasureReqTab), sizeof(MEASURE_REQ_TAB));
+#endif
 	if (pAd->CommonCfg.pMeasureReqTab)
 		NdisZeroMemory(pAd->CommonCfg.pMeasureReqTab, sizeof(MEASURE_REQ_TAB));
 	else
@@ -351,10 +358,11 @@ VOID MeasureReqTabExit(
 	IN PRTMP_ADAPTER pAd)
 {
 	NdisFreeSpinLock(&pAd->CommonCfg.MeasureReqTabLock);
-
+#ifndef HIGHLY_OPTIMIZE
 	if (pAd->CommonCfg.pMeasureReqTab)
 /*		kfree(pAd->CommonCfg.pMeasureReqTab);*/
 		os_free_mem(NULL, pAd->CommonCfg.pMeasureReqTab);
+#endif    
 	pAd->CommonCfg.pMeasureReqTab = NULL;
 
 	return;
@@ -552,6 +560,11 @@ VOID MeasureReqDelete(
 	return;
 }
 
+#ifdef HIGHLY_OPTIMIZE
+MEASURE_REQ_TAB __TpcReqTab;
+#endif
+
+
 NDIS_STATUS	TpcReqTabInit(
 	IN PRTMP_ADAPTER pAd)
 {
@@ -560,7 +573,11 @@ NDIS_STATUS	TpcReqTabInit(
 	NdisAllocateSpinLock(pAd, &pAd->CommonCfg.TpcReqTabLock);
 
 /*	pAd->CommonCfg.pTpcReqTab = kmalloc(sizeof(TPC_REQ_TAB), GFP_ATOMIC);*/
+#ifdef HIGHLY_OPTIMIZE
+    pAd->CommonCfg.pTpcReqTab = &__TpcReqTab;
+#else
 	os_alloc_mem(pAd, (UCHAR **)&(pAd->CommonCfg.pTpcReqTab), sizeof(TPC_REQ_TAB));
+#endif
 	if (pAd->CommonCfg.pTpcReqTab)
 		NdisZeroMemory(pAd->CommonCfg.pTpcReqTab, sizeof(TPC_REQ_TAB));
 	else
@@ -576,10 +593,12 @@ VOID TpcReqTabExit(
 	IN PRTMP_ADAPTER pAd)
 {
 	NdisFreeSpinLock(&pAd->CommonCfg.TpcReqTabLock);
-
+    
+#ifndef HIGHLY_OPTIMIZE
 	if (pAd->CommonCfg.pTpcReqTab)
 /*		kfree(pAd->CommonCfg.pTpcReqTab);*/
 		os_free_mem(NULL, pAd->CommonCfg.pTpcReqTab);
+#endif    
 	pAd->CommonCfg.pTpcReqTab = NULL;
 
 	return;

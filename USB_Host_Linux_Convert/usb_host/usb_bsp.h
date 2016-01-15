@@ -30,9 +30,9 @@
 #define __USB_BSP__H__
 
 /* Includes ------------------------------------------------------------------*/
-#include "usb_core.h"
 #include "usb_conf.h"
-
+#include "usbh_def.h"
+#include "usb_hcd_int.h"
 /** @addtogroup USB_OTG_DRIVER
   * @{
   */
@@ -49,6 +49,11 @@
 /**
   * @}
   */ 
+#define  USBH_TASK_PRIO                       16u 
+#define  USBH_PROBE_TASK_PRIO                 15u
+
+#define  USBH_TASK_STK_SIZE                              128u
+#define  USBH_PROBE_TASK_STK_SIZE                        512u
 
 
 /** @defgroup USB_BSP_Exported_Types
@@ -76,16 +81,15 @@
 /** @defgroup USB_BSP_Exported_FunctionsPrototype
   * @{
   */ 
-void BSP_Init(void);
 
-void USB_OTG_BSP_Init (USB_OTG_CORE_HANDLE *pdev);
+
+void USB_OTG_BSP_Init (int coreID);
 void USB_OTG_BSP_uDelay (const uint32_t usec);
 void USB_OTG_BSP_mDelay (const uint32_t msec);
-void USB_OTG_BSP_EnableInterrupt (USB_OTG_CORE_HANDLE *pdev);
-#ifdef USE_HOST_MODE
-void USB_OTG_BSP_ConfigVBUS(USB_OTG_CORE_HANDLE *pdev);
-void USB_OTG_BSP_DriveVBUS(USB_OTG_CORE_HANDLE *pdev,uint8_t state);
-#endif
+void USB_OTG_BSP_EnableInterrupt(void *otg_handle, int coreID);
+void USB_OTG_BSP_ConfigVBUS(int coreID);
+void USB_OTG_BSP_DriveVBUS(uint8_t state, int coreID);
+
 /**
   * @}
   */ 

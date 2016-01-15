@@ -1,8 +1,8 @@
 #include "fs_cvt.h"
-#include "usbh_config.h"
+#include "usbh_debug.h"
 #include "memory.h"
 #include "string.h"
-#include "RT2870STA.c"
+#include "rt2870sta_conf.h"
 
 
 int filp_write(struct file *file, char  *buff, unsigned int size, loff_t *loff);

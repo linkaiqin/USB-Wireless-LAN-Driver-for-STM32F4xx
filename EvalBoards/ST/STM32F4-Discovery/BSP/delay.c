@@ -8,29 +8,6 @@ static __IO uint32_t TimingDelay;
 /* Private function prototypes -----------------------------------------------*/
 
 
-// static u32 PreTime = 0;
-// static u32 CurTime = 0;
-
-//void Time_MeasureStart()
-//{
-//    PreTime = SysTick->VAL;
-//}
-
-
-
-//int Time_MeasureEnd()//us
-//{
-//    CurTime = SysTick->VAL;
-
-//    if(CurTime > PreTime)
-//    {
-//        return CPU_FREQUENCY_MHZ*1000 - (CurTime - PreTime);
-//    }
-//    else
-//        return PreTime - CurTime;
-//}
-
-
 void delay_us(__IO uint32_t nTime)
 {
     int old_val,new_val,val;

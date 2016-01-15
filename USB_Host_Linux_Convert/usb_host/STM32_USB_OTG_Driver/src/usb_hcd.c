@@ -26,11 +26,8 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "usb_core.h"
+#include "os.h"
 #include "usb_hcd.h"
-#include "usb_conf.h"
-#include "usb_bsp.h"
-
 
 /** @addtogroup USB_OTG_DRIVER
   * @{
@@ -95,18 +92,21 @@
   * @retval Status
   */
 uint32_t HCD_Init(USB_OTG_CORE_HANDLE *pdev , 
-                  USB_OTG_CORE_ID_TypeDef coreID)
+                  int coreID)
 {
   uint8_t i = 0;
-  pdev->host.ConnSts = 0;
+
+  pdev->host.ConnSts = USB_STATE_NOTATTACHED;
+  pdev->host.PreConnSts = USB_STATE_NOTATTACHED;
+  pdev->host.pre_post_state = USB_STATE_NOTATTACHED;
   
   for (i= 0; i< USB_OTG_MAX_TX_FIFOS; i++)
   {
-  pdev->host.ErrCnt[i]  = 0;
   pdev->host.XferCnt[i]   = 0;
   pdev->host.HC_Status[i]   = HC_IDLE;
   }
   pdev->host.hc[0].max_packet  = 8; 
+
 
   USB_OTG_SelectCore(pdev, coreID);
 #ifndef DUAL_ROLE_MODE_ENABLED
@@ -115,7 +115,7 @@ uint32_t HCD_Init(USB_OTG_CORE_HANDLE *pdev ,
 
   /* Force Host Mode*/
   USB_OTG_SetCurrentMode(pdev , HOST_MODE);
-  USB_OTG_CoreInitHost(pdev);
+  USB_OTG_CoreInitHost(pdev, coreID);
   USB_OTG_EnableGlobalInt(pdev);
 #endif
    
@@ -238,12 +238,12 @@ uint32_t HCD_HC_Init (USB_OTG_CORE_HANDLE *pdev , uint8_t hc_num)
   * @param  hc_num: Channel number 
   * @retval status
   */
-uint32_t HCD_SubmitRequest (USB_OTG_CORE_HANDLE *pdev , uint8_t hc_num) 
+int HCD_SubmitRequest (USB_OTG_CORE_HANDLE *pdev , struct usb_host_channel *ch) 
 {
-  
-  pdev->host.URB_State[hc_num] =   URB_IDLE;  
-  pdev->host.hc[hc_num].xfer_count = 0 ;
-  return USB_OTG_HC_StartXfer(pdev, hc_num);
+  pdev->host.HC_Status[ch->hc_num]   = HC_IDLE;
+  pdev->host.URB_State[ch->hc_num] =   URB_IDLE;  
+    
+  return USB_OTG_HC_StartXfer(pdev, ch);
 }
 
 

@@ -2550,7 +2550,9 @@ struct _RTMP_ADAPTER {
 #if defined(CONFIG_MULTI_CHANNEL) || defined(DOT11Z_TDLS_SUPPORT)
 	RTMP_OS_SEM MultiChannelLock;
 #endif /* defined(CONFIG_MULTI_CHANNEL) || defined(DOT11Z_TDLS_SUPPORT) */
-	PVOID UsbVendorReqBuf;
+#ifndef HIGHLY_OPTIMIZE
+ 	PVOID UsbVendorReqBuf;
+#endif    
 /*	wait_queue_head_t		*wait; */
 	VOID *wait;
 

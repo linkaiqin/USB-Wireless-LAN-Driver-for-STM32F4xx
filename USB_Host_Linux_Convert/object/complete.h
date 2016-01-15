@@ -6,7 +6,7 @@
 
 
 struct completion {
-    OS_TCB *p_tcb;
+    struct semaphore sem;
 //	unsigned int done;
 //	wait_queue_head_t wait;
 };

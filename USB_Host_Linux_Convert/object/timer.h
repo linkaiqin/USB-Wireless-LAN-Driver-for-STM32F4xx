@@ -5,11 +5,12 @@
 #include "stdint.h"
 #include "delay.h"
 
-extern volatile uint32_t jiffies;
+
+#define jiffies  OSTickCtr
+
 #define HZ   OS_CFG_TICK_RATE_HZ
+
 #define udelay   delay_us
-
-
 #define mdelay delay_ms
 
 struct timer_list {

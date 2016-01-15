@@ -10,6 +10,7 @@
  */
 
 /***************************** INCLUDES *****************************/
+#include "os.h"
 #include "misc_cvt.h"
 #include "memory.h"
 #include "errno.h"
@@ -665,7 +666,7 @@ iw_get_priv_info(int		skfd,
   int			maxpriv = 20;	/* Minimum for compatibility WE<13 */
 //  iwprivargs *		newpriv;
   int ret;
-  struct iw_request_info info;
+  struct iw_request_info info = {0};
 
   /* Some driver may return a very large number of ioctls. Some
    * others a very small number. We now use a dynamic allocation

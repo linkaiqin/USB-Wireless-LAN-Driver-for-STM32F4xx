@@ -108,6 +108,8 @@ struct pid_link
 
 
 struct task_struct {
+    //note:we need to use the structure after calling OSMemCreate(),so we remain 4 octes to link next bulk.
+    void *next_bulk;    
     OS_TCB tcb;    
     OS_PRIO prio;
     CPU_STK *stk; 

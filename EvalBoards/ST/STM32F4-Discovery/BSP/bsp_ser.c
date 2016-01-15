@@ -435,14 +435,11 @@ void Ser_RxTask(void)
 {
     CPU_INT08U ret;
     char ch;
-    OS_ERR err;
 #ifdef USE_BUF_PRINTF    
+    OS_ERR err;
     OS_PEND_DATA  pend_data_tbl[2];
 #endif    
-//    SHELL_ERR err;
-//    RX_CALLBACK call_back;
-//    void *p_arg;
-//     CPU_SR cpu_sr;
+
     struct finsh_shell *shell = &_shell;
     memset(shell, 0, sizeof(struct finsh_shell));
 
@@ -656,9 +653,9 @@ void Ser_RxTask(void)
 
                 if (shell->line_position != 0)
                 {
-
+                    SHELL_ERR shell_err;
                     rt_kprintf("\n");
-                    Shell_Exec(shell->line, NULL, NULL, &err);
+                    Shell_Exec(shell->line, NULL, NULL, &shell_err);
 //                       finsh_run_line(&shell->parser, shell->line);
                 }
                 else rt_kprintf("\n");

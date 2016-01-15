@@ -110,11 +110,10 @@ void  App_OS_ClrAllHooks (void)
 * Note(s)    : none
 ************************************************************************************************************************
 */
-extern void TaskCreateHook(OS_TCB *p_tcb);
+
 void  App_OS_TaskCreateHook (OS_TCB  *p_tcb)
 {
-    TaskCreateHook(p_tcb);
-//     (void)&p_tcb;
+     (void)&p_tcb;
 }
 
 /*$PAGE*/
@@ -244,12 +243,8 @@ void  App_OS_TaskSwHook (void)
 * Note(s)    : 1) This function is assumed to be called from the Tick ISR.
 ************************************************************************************************************************
 */
-#include "stdint.h"
-volatile uint32_t jiffies = 0;
-extern void disk_timerproc (void);
+
 void  App_OS_TimeTickHook (void)
 {
-    jiffies++;
-    
-//     disk_timerproc();
+
 }

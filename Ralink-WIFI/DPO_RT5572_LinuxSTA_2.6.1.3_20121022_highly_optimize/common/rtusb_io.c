@@ -953,12 +953,18 @@ NTSTATUS    RTUSB_VendorRequest(
 			DBGPRINT(RT_DEBUG_ERROR, ("UsbVendorReq_semaphore get failed\n"));
 			return NDIS_STATUS_FAILURE;
 		}
-
+#ifndef HIGHLY_OPTIMIZE
 		if ((TransferBufferLength > 0) && (RequestType == DEVICE_VENDOR_REQUEST_OUT))
 				NdisMoveMemory(pAd->UsbVendorReqBuf, TransferBuffer, TransferBufferLength);
-
+#endif
 		do {
-			RTUSB_CONTROL_MSG(pObj->pUsb_Dev, 0, Request, RequestType, Value, Index, pAd->UsbVendorReqBuf, TransferBufferLength, CONTROL_TIMEOUT_JIFFIES, RET);
+			RTUSB_CONTROL_MSG(pObj->pUsb_Dev, 0, Request, RequestType, Value, Index, 
+#ifdef HIGHLY_OPTIMIZE
+            TransferBuffer, 
+#else
+            pAd->UsbVendorReqBuf, 
+#endif
+            TransferBufferLength, CONTROL_TIMEOUT_JIFFIES, RET);
 
 			if (RET < 0) {
 				DBGPRINT(RT_DEBUG_OFF, ("#\n"));
@@ -971,10 +977,10 @@ NTSTATUS    RTUSB_VendorRequest(
 				RTMPusecDelay(5000); /* wait for 5ms*/
 			}
 		} while((RET < 0) && (RetryCount < MAX_VENDOR_REQ_RETRY_COUNT));
-
+#ifndef HIGHLY_OPTIMIZE
 	  	if ( (!(RET < 0)) && (TransferBufferLength > 0) && (RequestType == DEVICE_VENDOR_REQUEST_IN))
 			NdisMoveMemory(TransferBuffer, pAd->UsbVendorReqBuf, TransferBufferLength);
-
+#endif
 	  	RTMP_SEM_EVENT_UP(&(pAd->UsbVendorReq_semaphore));
 
         	if (RET < 0) {

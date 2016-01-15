@@ -802,7 +802,9 @@ Note:
 HTTX_BUFFER __HTTXContext_Buffer;
 TX_BUFFER __NullContext_Buffer;
 TX_BUFFER __PSContext_Buffer;
-unsigned char __RxContext_Buffer[RX_RING_SIZE*MAX_RXBULK_SIZE];
+//In DMA mode, DMA transfer address must be in 0x20000000 ram area,
+//and __RxContext_Buffer must be aligned to 4 bytes.
+__attribute__((section("RW_IRAM1"))) __attribute__((aligned)) unsigned char __RxContext_Buffer[RX_RING_SIZE*MAX_RXBULK_SIZE];
 #endif
 
 
@@ -1291,12 +1293,14 @@ NDIS_STATUS RTMPAllocTxRxRingMemory(
             break;
 
         NdisZeroMemory(&pAd->FragFrame, sizeof(FRAGMENT_FRAME));
+#ifndef HIGHLY_OPTIMIZE        
         pAd->FragFrame.pFragPacket =  RTMP_AllocateFragPacketBuffer(pAd, RX_BUFFER_NORMSIZE);
 
         if (pAd->FragFrame.pFragPacket == NULL)
         {
             Status = NDIS_STATUS_RESOURCES;
         }
+#endif        
     }
     while (FALSE);
 

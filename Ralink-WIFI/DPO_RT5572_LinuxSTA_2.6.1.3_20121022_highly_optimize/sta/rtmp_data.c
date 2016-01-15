@@ -937,6 +937,9 @@ BOOLEAN STARxDoneInterruptHandle(
 
 		if (pRxWI->MPDUtotalByteCount < 14)
 		{
+#ifdef HIGHLY_OPTIMIZE
+            RELEASE_NDIS_PACKET(pAd, pRxPacket, NDIS_STATUS_FAILURE); //Packet should be freed.	           
+#endif
 			Status = NDIS_STATUS_FAILURE;
 			continue;
 		}

@@ -2,6 +2,7 @@
 #include "rt_config.h"
 #include "lwip/tcpip.h"
 #include "lwip/dhcp.h"
+#include "lwip/netifapi.h"
 #include "wlan_ethernetif.h"
 #include "shell.h"
 #include "wlan.h"
@@ -39,27 +40,32 @@ void wireless_send_event(struct net_device *	dev,
 			 char *			extra)
 {
     
-    printf("wireless_send_event[%d] ",cmd);
+    printf("wireless_send_event[0x%x]",cmd);
 
 
     if(cmd == IWEVCUSTOM)
     {
-        printf(extra);
+        printf("[0x%x] %s\r\n",wrqu->data.flags,extra);
         switch (wrqu->data.flags) 
         {
             case IW_STA_LINKUP_EVENT_FLAG:
-                netif_set_link_up(&wireless_netif);
-
+                netifapi_netif_common(&wireless_netif, netif_set_link_up, NULL);
+#if LWIP_DHCP
+                printf("dhcp_start...\r\n");
+                netifapi_netif_common(&wireless_netif, NULL, dhcp_start);
+#endif 
                 break;
             case IW_STA_LINKDOWN_EVENT_FLAG:
-                netif_set_link_down(&wireless_netif); 
-               
-                break;                      
+                netifapi_netif_common(&wireless_netif, netif_set_link_down, NULL);
+#if LWIP_DHCP
+                netifapi_netif_common(&wireless_netif, dhcp_stop, NULL);
+                netifapi_netif_common(&wireless_netif, netif_set_down, NULL);
+                netifapi_netif_set_addr(&wireless_netif, IP_ADDR_ANY, IP_ADDR_ANY, IP_ADDR_ANY);
+#endif                 
+                break;                  
         }
 
     }   
-    
-    printf("\r\n");
 }
 
 
@@ -97,17 +103,17 @@ int wireless_exec_cmd(char *cmd)
 #if LWIP_DHCP   
 static void netif_status_callback(struct netif *netif)
 {
-    uint32_t addr;
+    ip_addr_t addr;
 
     if(netif_is_up(netif) && (netif->dhcp))
     {     
-        addr = netif->ip_addr.addr;
+        addr = netif->ip_addr;
         printf("DHCP IP:%d.%d.%d.%d\r\n", ip4_addr1(&addr), ip4_addr2(&addr),ip4_addr3(&addr),ip4_addr4(&addr));
 
-        addr = netif->gw.addr;
+        addr = netif->gw;
         printf("DHCP GW:%d.%d.%d.%d\r\n", ip4_addr1(&addr), ip4_addr2(&addr),ip4_addr3(&addr),ip4_addr4(&addr));
 
-        addr = netif->netmask.addr;
+        addr = netif->netmask;
         printf("DHCP MASK:%d.%d.%d.%d\r\n", ip4_addr1(&addr), ip4_addr2(&addr),ip4_addr3(&addr),ip4_addr4(&addr));
     }
 }
@@ -121,9 +127,9 @@ static void netif_status_callback(struct netif *netif)
   */
 void Netif_Config(void)
 {
-    struct ip_addr ipaddr;
-    struct ip_addr netmask;
-    struct ip_addr gw; 
+    ip_addr_t ipaddr;
+    ip_addr_t netmask;
+    ip_addr_t gw; 
 
 
 #if LWIP_DHCP
@@ -139,7 +145,7 @@ void Netif_Config(void)
         printf("STATIC IP:%d.%d.%d.%d\r\n",ip4_addr1(&ipaddr), ip4_addr2(&ipaddr),ip4_addr3(&ipaddr),ip4_addr4(&ipaddr));
         printf("STATIC GW:%d.%d.%d.%d\r\n",ip4_addr1(&gw), ip4_addr2(&gw),ip4_addr3(&gw),ip4_addr4(&gw));
         printf("STATIC MASK:%d.%d.%d.%d\r\n",ip4_addr1(&netmask), ip4_addr2(&netmask),ip4_addr3(&netmask),ip4_addr4(&netmask));
-    #endif
+#endif
 
         /* - netif_add(struct netif *netif, struct ip_addr *ipaddr,
                   struct ip_addr *netmask, struct ip_addr *gw,
@@ -156,13 +162,12 @@ void Netif_Config(void)
         netif_add(&wireless_netif, &ipaddr, &netmask, &gw, NULL, &wlan_ethernetif_init, &tcpip_input);
  
         /*  Registers the default network interface.*/
-        netif_set_default(&wireless_netif);
+       netifapi_netif_common(&wireless_netif, netif_set_default, NULL);
        
 #if LWIP_DHCP
-        netif_set_status_callback(&wireless_netif, netif_status_callback);
-        dhcp_start(&wireless_netif);
+       netif_set_status_callback(&wireless_netif, netif_status_callback);
 #else
-        netif_set_up(&wireless_netif);
+       netifapi_netif_common(&wireless_netif, netif_set_up, NULL);
 #endif
 
 }

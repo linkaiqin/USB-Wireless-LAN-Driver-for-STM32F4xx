@@ -122,30 +122,13 @@ int main(void)
 *********************************************************************************************************
 */
 
-OS_TCB *TCBListTbl[12];
-int TCBListIndex = 0;
-
-void TaskCreateHook(OS_TCB *p_tcb)
-{
-    CPU_SR cpu_sr;
-
-    CPU_CRITICAL_ENTER();
-    if(TCBListIndex < 12)
-    {
-        TCBListTbl[TCBListIndex] = p_tcb;
-        TCBListIndex++;
-    }
-    CPU_CRITICAL_EXIT();
-}
-
-
-
-#include "usbh_core.h"
+#include "usbh_linux.h"
+#include "net_cvt.h"
 #include "memory.h"
 #include "shell.h"
 #include "wlan.h"
 #include "lwip/tcpip.h"
-
+#include "ping.h"
 
 extern CPU_INT16S iwpriv_main (CPU_INT16U argc,
                                CPU_CHAR *argv[],
@@ -154,9 +137,63 @@ extern CPU_INT16S iwpriv_main (CPU_INT16U argc,
 
 extern void iperf_init(void);
 
+extern int rtusb_init(void);
+
+extern void tasklet_task_init(void);
+
+extern const struct usb_device_id rtusb_dev_id[];
+extern struct net_device *_pnet_device;
 
 
 
+static void ralink_hotplug_call_back(struct usb_interface *intf, void *arg, int is_connect)
+{
+    struct net_device *net_dev = _pnet_device;
+    OS_ERR err;
+    CPU_SR cpu_sr;    
+    int ret;
+
+    
+    if(is_connect)
+    {
+        /* usb device is connected*/   
+
+        /* If a net device is registered, open it*/
+        if(_pnet_device)
+        {
+            _pnet_device->flags |= IFF_UP;
+            _pnet_device->usb_dev = interface_to_usbdev(intf);
+
+            ret = (*(_pnet_device->open))(_pnet_device);
+            if(ret)
+            {
+                printf("USBH_ProbeUSB _pnet_device->open Failed:%d\r\n",ret);
+                return;
+            }
+        }
+    }
+    else
+    {
+        /* usb device is disconnected*/ 
+        
+        /* Close net device */
+        if(_pnet_device)
+        {
+            CPU_CRITICAL_ENTER();
+            while(net_dev->status)
+            {
+                CPU_CRITICAL_EXIT();
+                //wait for NET_IOCTL_RUNNING or NET_XIMT_RUNNING
+                OSTimeDlyHMSM(0u, 0u, 0u, 10u, OS_OPT_TIME_HMSM_STRICT, &err);
+                CPU_CRITICAL_ENTER();
+            }
+            _pnet_device = NULL;
+            CPU_CRITICAL_EXIT();  
+
+            (net_dev->stop)(net_dev);
+        }
+    }
+}
 
 
 static  void  AppTaskStart (void *p_arg)
@@ -164,9 +201,7 @@ static  void  AppTaskStart (void *p_arg)
     CPU_INT32U  cpu_clk_freq;
     CPU_INT32U  cnts;
     OS_ERR      err;
-    RCC_ClocksTypeDef RCC_ClocksStatus;
-
-
+    SHELL_ERR   shell_err;
 
     (void)p_arg;
 
@@ -194,32 +229,45 @@ static  void  AppTaskStart (void *p_arg)
     App_OS_SetAllHooks();
 
 
-    RCC_GetClocksFreq(&RCC_ClocksStatus);
-    printf("SYSCLK_Frequency:%d,HCLK_Frequency:%d,PCLK1_Frequency:%d,PCLK2_Frequency:%d,ADCCLK_Frequency:%d\r\n", RCC_ClocksStatus.SYSCLK_Frequency, RCC_ClocksStatus.HCLK_Frequency, RCC_ClocksStatus.PCLK1_Frequency, RCC_ClocksStatus.PCLK2_Frequency, 0);
 
-
-    
+    /* Initializes uC/Shell */
     Shell_Init();
     /* Create tcp_ip stack thread */
     tcpip_init( NULL, NULL );
-    /* Initilaize the LwIP stack */
+    /* Configure the LwIP stack */
     Netif_Config();
+    
+    /* Initializes iperf */
+    iperf_init();
 
-
+    /* Create tasklet task used for usb wireless driver */
+    tasklet_task_init();
 #ifndef USE_LWIP_MALLOC
+    /* Initialize heap if not merge kmalloc() with lwip mem_malloc() function.
+     * see memory.h */
     usbh_mem_init();
 #endif
+    
+    /* Initializes usb host */
+    usb_init();
+    
+    /* Register ralink usb wireless driver */
+    rtusb_init();
+    /* Add hotplug function that will be called if usb device plugged and match the usb_device_id*/
+    usb_hotplug_add(&(struct usb_hotplug){rtusb_dev_id, ralink_hotplug_call_back, NULL});
 
-
-
-    USBH_Init();
-    Shell_CmdTblAdd("iwpriv", (SHELL_CMD[]){{"iwpriv", iwpriv_main},{0, 0 }}, &err);
-
+    /* If all usb driver are initialized, start usb host. */
+    usb_start();
+    
+    
+    /* Add iwpriv shell command*/
+    Shell_CmdTblAdd("iwpriv", (SHELL_CMD[]){{"iwpriv", iwpriv_main},{0, 0 }}, &shell_err);
+    /* Add ping shell command*/
+    Shell_CmdTblAdd("ping", (SHELL_CMD[]){ {"ping", ping}, {0, 0 }}, &shell_err);   
     
    
-    iperf_init();
     
-
+    /* Serial terminal process task, it will not return*/
     Ser_RxTask();
 
     while (DEF_TRUE)                                            /* Task body, always written as an infinite loop.       */
@@ -236,28 +284,14 @@ static  void  AppTaskStart (void *p_arg)
 
 void assert_failed(uint8_t *file, uint32_t line)
 {
-    printf("assert_failed in:%s,line:%d \n", file ? file : "n", line);
+    printf("assert_failed in:%s,line:%d \n", file ? (char *)file : "n", line);
     while (1);
 }
 
-void dump_tcblist()
-{
-    OS_TCB *p_tcb;
 
-    p_tcb = OSTaskDbgListPtr;
-    while(p_tcb)
-    {
-        printf("taskname:%s  StkSize:%d  StkUsed:%d\r\n",p_tcb->NamePtr,p_tcb->StkSize,p_tcb->StkUsed);
-        p_tcb = p_tcb->DbgNextPtr;
-    }
-}
 
-extern struct net_device *_pnet_device;
-extern struct usb_device _usb_device;
-extern int output_nest_ctr;
 
 static CPU_CHAR  my_buf_str[128];
-
 void  my_printf (char *format, ...)
 {
 
@@ -285,9 +319,10 @@ void  my_printf (char *format, ...)
 }
 
 #define printf my_printf
+
+
 void hard_fault_handler_c (unsigned int * hardfault_args)
 {
-    OS_TCB *p_tcb;
     unsigned int stacked_r0;
     unsigned int stacked_r1;
     unsigned int stacked_r2;
@@ -321,39 +356,11 @@ void hard_fault_handler_c (unsigned int * hardfault_args)
     printf ("AFSR = %x\r\n", (*((volatile unsigned long *)(0xE000ED3C))));
     printf ("SCB_SHCSR = %x\r\n", SCB->SHCSR);
 
-    printf("output_nest_ctr:%d\r\n",output_nest_ctr);
-//    printf("usb_nperiod_task_req_num:%d urb_nperiod_queue.num:%d max_num:%d\r\n",_usb_device.usb_nperiod_task_req_num,_usb_device.urb_nperiod_queue.num,_usb_device.urb_nperiod_queue.max_num_record);
     printf("OSIntNestingCtr:%d  OSSchedLockNestingCtr:%d CPU_IntDisNestCtr:%d\r\n",OSIntNestingCtr,OSSchedLockNestingCtr,CPU_IntDisNestCtr);
     printf("OSTCBCurPtr->NamePtr = %s StkSize:%d  StkUsed:%d\r\n",OSTCBCurPtr->NamePtr,OSTCBCurPtr->StkSize,OSTCBCurPtr->StkUsed);
-    printf("total task:%d\r\n",TCBListIndex);
-    p_tcb = TCBListTbl[0];
-    printf("%20s  prio:%d StkSize:%d  StkUsed:%d StkHi:%p StkLw:%p StkPtr:%p\r\n",p_tcb->NamePtr,p_tcb->Prio,p_tcb->StkSize,p_tcb->StkUsed,p_tcb->StkBasePtr+p_tcb->StkSize,p_tcb->StkBasePtr,p_tcb->StkPtr);
-    p_tcb = TCBListTbl[1];
-    printf("%20s  prio:%d StkSize:%d  StkUsed:%d StkHi:%p StkLw:%p StkPtr:%p\r\n",p_tcb->NamePtr,p_tcb->Prio,p_tcb->StkSize,p_tcb->StkUsed,p_tcb->StkBasePtr+p_tcb->StkSize,p_tcb->StkBasePtr,p_tcb->StkPtr);
-    p_tcb = TCBListTbl[2];
-    printf("%20s  prio:%d StkSize:%d  StkUsed:%d StkHi:%p StkLw:%p StkPtr:%p\r\n",p_tcb->NamePtr,p_tcb->Prio,p_tcb->StkSize,p_tcb->StkUsed,p_tcb->StkBasePtr+p_tcb->StkSize,p_tcb->StkBasePtr,p_tcb->StkPtr);
-    p_tcb = TCBListTbl[3];
-    printf("%20s  prio:%d StkSize:%d  StkUsed:%d StkHi:%p StkLw:%p StkPtr:%p\r\n",p_tcb->NamePtr,p_tcb->Prio,p_tcb->StkSize,p_tcb->StkUsed,p_tcb->StkBasePtr+p_tcb->StkSize,p_tcb->StkBasePtr,p_tcb->StkPtr);
-    p_tcb = TCBListTbl[4];
-    printf("%20s  prio:%d StkSize:%d  StkUsed:%d StkHi:%p StkLw:%p StkPtr:%p\r\n",p_tcb->NamePtr,p_tcb->Prio,p_tcb->StkSize,p_tcb->StkUsed,p_tcb->StkBasePtr+p_tcb->StkSize,p_tcb->StkBasePtr,p_tcb->StkPtr);
-    p_tcb = TCBListTbl[5];
-    printf("%20s  prio:%d StkSize:%d  StkUsed:%d StkHi:%p StkLw:%p StkPtr:%p\r\n",p_tcb->NamePtr,p_tcb->Prio,p_tcb->StkSize,p_tcb->StkUsed,p_tcb->StkBasePtr+p_tcb->StkSize,p_tcb->StkBasePtr,p_tcb->StkPtr);
-//     p_tcb = TCBListTbl[6];
-//     printf("taskname:%s  StkSize:%d  StkUsed:%d\r\n",p_tcb->NamePtr,p_tcb->StkSize,p_tcb->StkUsed);
-//
-//     for(i = 0;i < TCBListIndex; i++)
-//     {
-//         p_tcb = TCBListTbl[TCBListIndex];
-//          printf("taskname:%s  StkSize:%d  StkUsed:%d\r\n",p_tcb->NamePtr,p_tcb->StkSize,p_tcb->StkUsed);
-//     }
 
 
     while (1);
-
-    //  while(USART_GetFlagStatus(USART1,USART_FLAG_RXNE) == RESET);
-//     APP_TRACE_INFO(("please input cmd\r\n"));
-//  cmd = BSP_Ser_RdByte();
-
 }
 
 

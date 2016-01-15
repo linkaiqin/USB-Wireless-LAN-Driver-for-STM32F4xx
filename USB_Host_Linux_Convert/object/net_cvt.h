@@ -77,8 +77,20 @@ struct ethtool_ops {
 //};
 
 
-#define NET_XIMT_RUNNING       0X0001
-#define NET_IOCTL_RUNNING      0X0002
+#define NET_XIMT_RUNNING          0X0001
+#define NET_IOCTL_RUNNING         0X0002
+#define NET_SMARTLINK_RUNNING     0X0004
+
+
+enum netdev_queue_state_t
+{
+	__QUEUE_STATE_XOFF,
+//	__QUEUE_STATE_FROZEN,
+};
+
+
+typedef void (*net_monitor_function)(unsigned char *, int);
+void register_net_monitor_function(net_monitor_function func);
 
 
 
@@ -90,13 +102,16 @@ struct net_device
 	 * the interface.
 	 */
     void   *netif; //struct netif *
+
+    void *usb_dev; //struct usb_device *
     
 	char			name[IFNAMSIZ];
 
 
     int status;//new add
     
-	unsigned long		state;
+	unsigned long		queue_state;
+    OS_SEM queue_sem;
     
 
 	void			*ml_priv;
@@ -173,6 +188,7 @@ int netif_rx(struct sk_buff *skb);
 
 typedef unsigned char *sk_buff_data_t;
 struct sk_buff {
+    const char *func;
 	struct net_device	*dev;    
 	/*
 	 * This is the control buffer. It is free to use for every

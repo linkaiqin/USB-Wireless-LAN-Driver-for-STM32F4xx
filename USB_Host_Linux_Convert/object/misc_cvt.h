@@ -1,7 +1,6 @@
 #ifndef _MISC_CVT_H
 #define _MISC_CVT_H
 #include "stdio.h"
-#include "stm32f4xx_conf.h"
 #include "string.h"
 #include "type.h"
 
@@ -36,26 +35,32 @@
 
 
 
-typedef int (*USB_INIT_FUNC)(void);
-typedef int (*USB_EXIT_FUNC)(void);
+//#define test_bit(nr, addr)   (*addr & (1L << nr))
+//#define __set_bit(nr, addr)   *addr |=  (1L << nr)
+//#define __clr_bit(nr, addr)   *addr &=  ~(1L << nr)
+//#define set_bit __set_bit
+//#define clear_bit __clr_bit
+
+/**
+ * assert() equivalent, that is always enabled.
+ */
+#define misc_assert(cond) do {                                           \
+    if (!(cond)) {                                                      \
+        printf("Assertion %s failed at %s:%d\r\n",                        \
+               #cond, __func__, __LINE__);                              \
+        while(1);                                                        \
+    }                                                                   \
+} while (0)
 
 
-
-#define test_bit(nr, addr)   (*addr & (1L << nr))
-#define __set_bit(nr, addr)   *addr |=  (1L << nr)
-#define __clr_bit(nr, addr)   *addr &=  ~(1L << nr)
-
-#define set_bit __set_bit
-#define clear_bit __clr_bit
-
-#define BUG() printf("bug\r\n")
-#define BUG_ON(x) 			assert_param(!(x))
-#define WARN_ON(x) 		assert_param(!(x))
-#define BUILD_BUG_ON(x)	assert_param(!(x))
+#define BUG() do{printf("bug\r\n");while(1);}while(0)
+#define BUG_ON(x) 			misc_assert(!(x))
+#define WARN_ON(x) 		misc_assert(!(x))
+#define BUILD_BUG_ON(x)	misc_assert(!(x))
 
 #define mb()
-#define module_init(init_func) USB_INIT_FUNC *_usb_init_func = init_func
-#define module_exit(exit_func) USB_EXIT_FUNC *_usb_exit_func = exit_func
+#define module_init(init_func) 
+#define module_exit(exit_func)
 
 #define module_put(x)
 #define try_module_get(x)  1
@@ -68,6 +73,7 @@ typedef int (*USB_EXIT_FUNC)(void);
 #define MODULE_LICENSE(x)
 
 #define __cpu_to_le16(x) ((__u16)(__u16)(x))
+#define le16_to_cpu(val) (val)
 
 /*
  * Check at compile time that something is of a particular type.

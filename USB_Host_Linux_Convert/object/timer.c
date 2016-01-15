@@ -1,9 +1,12 @@
 //#define USBH_DEBUG_LEVEL USBH_DEBUG_TRACE
 #include "os.h"
-#include "usbh_config.h"
+#include "usbh_debug.h"
 #include "string.h"
 #include "timer.h"
 #include "misc_cvt.h"
+
+
+
 
 
 unsigned int TimerTotalCtr = 0;
@@ -28,7 +31,7 @@ int mod_timer(struct timer_list *timer, unsigned long expires)
     OS_ERR err;
     OS_STATE state;
     int ret = 1;
-    
+    CPU_SR cpu_sr;
     
 
     //actived tmr
@@ -57,6 +60,16 @@ int mod_timer(struct timer_list *timer, unsigned long expires)
     {
         //expires is 1 at least
         USBH_TRACE("OSTmrCreate period =%ld\r\n",expires);
+
+
+#if OS_CFG_DBG_EN > 0u
+        //The procedure mod_timer()-->OSTmrCreate()-->OS_TmrDbgListAdd() is dangerous,
+        //because some linux driver don't call del_timer(), the timer instance will
+        //still exsit in OSTmrDbgListPtr after freed. Alway set OSTmrDbgListPtr to zero. 
+        CPU_CRITICAL_ENTER();
+        OSTmrDbgListPtr = NULL;
+        CPU_CRITICAL_EXIT();
+#endif        
         OSTmrCreate(&timer->tmr, "",expires, expires,OS_OPT_TMR_ONE_SHOT,timer_call_back, timer,&err);
         ret = 0;
     }

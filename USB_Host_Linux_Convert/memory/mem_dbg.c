@@ -54,16 +54,28 @@
  */
 
 #include "memory_middle.h"
-mem_size_t memory_used ;
-mem_size_t memory_used_max;
+#ifdef USE_LWIP_MALLOC 
+#include "lwip/opt.h"
+#endif
+
 
 #if !MEM_LIBC_MALLOC /* don't build if not configured for use in lwipopts.h */
 
-// #include "lwip/def.h"
-#include "mem_dbg.h"
+//#pragma import(__use_no_heap_region)
+
+#ifdef USE_LWIP_MALLOC 
+#include "lwip/def.h"
+#include "mem_cvt.h"
 // #include "lwip/sys.h"
-// #include "lwip/stats.h"
-// #include "lwip/err.h"
+ #include "lwip/stats.h"
+ #include "lwip/err.h"
+#else
+mem_size_t memory_used ;
+mem_size_t memory_used_max;
+
+#include "mem_cvt.h"
+#endif
+
 
 #include <string.h>
 
@@ -520,10 +532,6 @@ mem_malloc(mem_size_t size)
   if (size == 0) {
     return NULL;
   }
-//   if(size > 300)
-//   {
-//       printf("mem_malloc:%ld lr:0x%x  memory_used:%ld \r\n",size,lr,memory_used);
-//   }
 
   /* Expand the size of the allocated memory region so that we can
      adjust for alignment. */
@@ -661,16 +669,18 @@ void mem_check()
     mem_size_t ptr;
     struct mem *mem;
     int total_mem_block = 0;
-        
 
-    LWIP_DEBUGF(MEM_DEBUG,("-->memory_used_max:%ld !=0 \r\n",memory_used_max));     
-    for (ptr = (mem_size_t)((u8_t *)0); ptr < MEM_SIZE_ALIGNED;
+    LWIP_DEBUGF(MEM_DEBUG,("-->ram:0x%x  ram_end:0x%x  lfree:0x%x\r\n",ram, ram_end, lfree));  
+
+    LWIP_DEBUGF(MEM_DEBUG,("-->memory_used_max:%d\r\n",memory_used_max));  
+    
+    for (ptr = (mem_size_t)0;ptr < MEM_SIZE_ALIGNED;
                 ptr = ((struct mem *)(void *)&ram[ptr])->next) 
      {
         mem = (struct mem *)(void *)&ram[ptr];
         if(mem->used)
         {
-            LWIP_DEBUGF(MEM_DEBUG,("-->mem:%p not be freed lr:%lx \r\n",(u8_t *)mem + SIZEOF_STRUCT_MEM,mem->lr));
+            LWIP_DEBUGF(MEM_DEBUG,("-->mem:%p size:%d not be freed lr:%lx \r\n",(u8_t *)mem + SIZEOF_STRUCT_MEM,mem->next - ptr - SIZEOF_STRUCT_MEM,mem->lr));
         }
         total_mem_block ++;
      }

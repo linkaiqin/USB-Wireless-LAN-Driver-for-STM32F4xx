@@ -447,7 +447,7 @@
 #define MAX_LEN_OF_SSID                 32
 #define CIPHER_TEXT_LEN                 128
 #define HASH_TABLE_SIZE                 1//256	/* Size of hash tab must be power of 2. */
-#define MAX_VIE_LEN                     1024	/* New for WPA cipher suite variable IE sizes. */
+#define MAX_VIE_LEN                     256//1024	/* New for WPA cipher suite variable IE sizes. */
 #define MAX_SUPPORT_MCS             32
 #define MAX_NUM_OF_BBP_LATCH             256
 #undef MAX_NUM_OF_BBP_LATCH

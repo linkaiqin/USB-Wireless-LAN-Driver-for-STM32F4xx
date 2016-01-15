@@ -574,7 +574,9 @@ VOID	RTMPFreeAdapter(
 	RTMP_OS_FREE_TASK(pAd);
 	RTMP_OS_FREE_SEM(pAd);
 	RTMP_OS_FREE_ATOMIC(pAd);
-#ifndef HIGHLY_OPTIMIZE
+#ifdef HIGHLY_OPTIMIZE
+    pAd->OS_Cookie = NULL;  //driver must be probed only once.
+#else
 	RtmpOsVfree(pAd); /* pci_free_consistent(os_cookie->pci_dev,sizeof(RTMP_ADAPTER),pAd,os_cookie->pAd_pa); */
 #endif
 	if (os_cookie)

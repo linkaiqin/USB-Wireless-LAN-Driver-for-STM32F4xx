@@ -158,6 +158,7 @@ struct ifmap
  * remainder may be interface specific.
  */
 
+#if 0
 struct ifreq 
 {
 #define IFHWADDRLEN	6
@@ -182,6 +183,9 @@ struct ifreq
 //		struct	if_settings ifru_settings;
 	} ifr_ifru;
 };
+#endif
+
+
 
 #define ifr_name	ifr_ifrn.ifrn_name	/* interface name 	*/
 #define ifr_hwaddr	ifr_ifru.ifru_hwaddr	/* MAC address 		*/
@@ -213,8 +217,8 @@ struct ifconf
 	int	ifc_len;			/* size of buffer	*/
 	union 
 	{
-		char __user *ifcu_buf;
-		struct ifreq __user *ifcu_req;
+		char  *ifcu_buf;
+		struct ifreq  *ifcu_req;
 	} ifc_ifcu;
 };
 #define	ifc_buf	ifc_ifcu.ifcu_buf		/* buffer address	*/

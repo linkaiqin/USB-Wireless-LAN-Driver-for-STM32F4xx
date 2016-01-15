@@ -30,7 +30,8 @@
 #define __USB_OTG_REGS_H__
 
 /* Includes ------------------------------------------------------------------*/
-#include "usb_conf.h"
+#include "type.h"
+#define     __IO    volatile             /*!< Defines 'read / write' permissions              */
 
 
 /** @addtogroup USB_OTG_DRIVER

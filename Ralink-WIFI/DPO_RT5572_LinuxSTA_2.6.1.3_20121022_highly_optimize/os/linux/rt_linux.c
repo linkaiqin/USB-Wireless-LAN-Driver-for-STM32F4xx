@@ -209,12 +209,7 @@ NDIS_STATUS os_alloc_mem(
 	IN VOID *pReserved,
 	OUT UCHAR **mem,
 	IN ULONG size)
-{
-//    if(size > 500)
-//    {
-//        printf("os_alloc_mem:%d \r\n",size);
-//    }
-    
+{    
 	*mem = (PUCHAR) kmalloc(size, GFP_ATOMIC);
 	if (*mem) {
 #ifdef VENDOR_FEATURE4_SUPPORT

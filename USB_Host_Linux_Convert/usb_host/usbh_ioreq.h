@@ -51,9 +51,7 @@
 /** @defgroup USBH_IOREQ_Exported_Defines
   * @{
   */
-#define USBH_SETUP_PKT_SIZE   8
-#define USBH_EP0_EP_NUM       0
-#define USBH_MAX_PACKET_SIZE  0x40
+
 /**
   * @}
   */ 
@@ -84,55 +82,44 @@
 /** @defgroup USBH_IOREQ_Exported_FunctionsPrototype
   * @{
   */
-USBH_Status USBH_CtlSendSetup ( USB_OTG_CORE_HANDLE *pdev, 
-                                uint8_t *buff, 
-                                uint8_t hc_num);
 
-USBH_Status USBH_CtlSendData ( USB_OTG_CORE_HANDLE *pdev, 
-                                uint8_t *buff, 
-                                uint16_t length,
-                                uint8_t hc_num);
+struct usb_device;
 
-USBH_Status USBH_CtlReceiveData( USB_OTG_CORE_HANDLE *pdev, 
+int USBH_CtlSendData (struct usb_device *dev, 
                                 uint8_t *buff, 
                                 uint16_t length,
-                                uint8_t hc_num);
+                                struct usb_host_channel *ch);
 
-USBH_Status USBH_BulkReceiveData( USB_OTG_CORE_HANDLE *pdev, 
+int USBH_CtlReceiveData(struct usb_device *dev, 
                                 uint8_t *buff, 
                                 uint16_t length,
-                                uint8_t hc_num);
+                                struct usb_host_channel *ch);
 
-USBH_Status USBH_BulkSendData ( USB_OTG_CORE_HANDLE *pdev, 
+int USBH_BulkIntReceiveData(struct usb_device *dev, 
                                 uint8_t *buff, 
                                 uint16_t length,
-                                uint8_t hc_num);
+                                struct usb_host_channel *ch);
 
-USBH_Status USBH_InterruptReceiveData( USB_OTG_CORE_HANDLE *pdev, 
-                                       uint8_t             *buff, 
-                                       uint8_t             length,
-                                       uint8_t             hc_num);
 
-USBH_Status USBH_InterruptSendData( USB_OTG_CORE_HANDLE *pdev, 
-                                    uint8_t *buff, 
-                                    uint8_t length,
-                                    uint8_t hc_num);
-
-// USBH_Status USBH_CtlReq (USB_OTG_CORE_HANDLE *pdev,
-//                          USBH_HOST *phost, 
-//                          uint8_t             *buff,
-//                          uint16_t            length);
-
-USBH_Status USBH_IsocReceiveData( USB_OTG_CORE_HANDLE *pdev, 
+int USBH_BulkIntSendData (struct usb_device *dev, 
                                 uint8_t *buff, 
-                                uint32_t length,
-                                uint8_t hc_num);
+                                uint16_t length,
+                                struct usb_host_channel *ch);
 
 
-USBH_Status USBH_IsocSendData( USB_OTG_CORE_HANDLE *pdev, 
-                                uint8_t *buff, 
-                                uint32_t length,
-                                uint8_t hc_num);
+int USBH_IsocReceiveData(struct usb_device *dev, 
+                            uint8_t *buff, 
+                            uint32_t length,
+                            struct usb_host_channel *ch);
+
+
+
+int USBH_IsocSendData(struct usb_device *dev, 
+                        uint8_t *buff, 
+                        uint32_t length,
+                        struct usb_host_channel *ch);
+
+
 /**
   * @}
   */ 

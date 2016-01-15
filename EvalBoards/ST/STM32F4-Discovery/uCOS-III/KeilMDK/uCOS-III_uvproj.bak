@@ -334,7 +334,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
+            <Optim>3</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
@@ -349,7 +349,7 @@
             <VariousControls>
               <MiscControls>--gnu -DHIGHLY_OPTIMIZE -DMEMORY_OPTIMIZATION -DMLMEQUEUE_ALLOC_INUSE -DVENDOR_FEATURE2_SUPPORT -DAGGREGATION_SUPPORT -DPIGGYBACK_SUPPORT -DWMM_SUPPORT -DLINUX -DSYSTEM_LOG_SUPPORT -DRT28xx_MODE=STA -DCHIPSET=5572 -DCONFIG_RA_NAT_NONE -DCONFIG_STA_SUPPORT -DDBG -DDOT11_N_SUPPORT -DDOT11N_DRAFT3 -DSTATS_COUNT_SUPPORT -DLED_CONTROL_SUPPORT -DRTMP_MAC_USB -DRTMP_USB_SUPPORT -DRT2870 -DRT28xx -DRTMP_TIMER_TASK_SUPPORT -DA_BAND_SUPPORT -DRTMP_MAC_USB -DRTMP_USB_SUPPORT -DRT2870 -DRT28xx -DRT30xx -DRT35xx -DRT3572 -DRTMP_TIMER_TASK_SUPPORT -DRTMP_RF_RW_SUPPORT -DRTMP_EFUSE_SUPPORT -DA_BAND_SUPPORT -DVCORECAL_SUPPORT -DRTMP_MAC_USB -DRTMP_USB_SUPPORT -DRT30xx -DRT35xx -DRT3593 -DRT3573 -DRTMP_TIMER_TASK_SUPPORT -DRTMP_RF_RW_SUPPORT -DRTMP_EFUSE_SUPPORT -DA_BAND_SUPPORT -DDOT11N_SS3_SUPPORT -DVCORECAL_SUPPORT -DNEW_MBSSID_MODE -DRTMP_FREQ_CALIBRATION_SUPPORT -DRTMP_MAC_USB -DRT30xx -DRT33xx -DRT3070 -DRT3370 -DRT5370 -DRTMP_USB_SUPPORT -DRTMP_TIMER_TASK_SUPPORT -DRTMP_RF_RW_SUPPORT -DRTMP_EFUSE_SUPPORT -DRTMP_INTERNAL_TX_ALC -DRTMP_FREQ_CALIBRATION_SUPPORT -DVCORECAL_SUPPORT -DRTMP_TEMPERATURE_COMPENSATION -DNEW_MBSSID_MODE -DRTMP_MAC_USB -DRTMP_USB_SUPPORT -DRT30xx -DRT5572 -DRT5592 -DRTMP_RF_RW_SUPPORT -DRTMP_EFUSE_SUPPORT -DRTMP_TIMER_TASK_SUPPORT -DA_BAND_SUPPORT -DVCORECAL_SUPPORT -DRTMP_TEMPERATURE_COMPENSATION -DRTMP_FREQ_CALIBRATION_SUPPORT
 </MiscControls>
-              <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,HSE_VALUE=8000000,USE_FULL_ASSERT,USE_USB_OTG_FS,USE_EMBEDDED_PHY</Define>
+              <Define>USE_STDPERIPH_DRIVER,STM32F40_41xxx,HSE_VALUE=8000000,USE_FULL_ASSERT</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\uCOS-III;..\..\BSP;..\..\..\..\..\uC-CPU;..\..\..\..\..\uC-CPU\ARM-Cortex-M4\RealView;..\..\..\..\..\uC-LIB;..\..\..\..\..\uC-LIB\Ports\ARM-Cortex-M4\RealView;..\..\..\..\..\uCOS-III\Source;..\..\..\..\..\uCOS-III\Ports\ARM-Cortex-M4\Generic\RealView;..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\inc;..\..\BSP\ST\CMSIS\Device\ST\STM32F4xx\Include;..\..\BSP\OS\uCOS-III;..\..\..\..\..\Ralink-WIFI\DPO_RT5572_LinuxSTA_2.6.1.3_20121022_highly_optimize\include;..\..\..\..\..\uC-Shell\Source;..\..\..\..\..\lwip-1.4.1\src\include;..\..\..\..\..\lwip-1.4.1\src\include\ipv4;..\..\..\..\..\lwip-1.4.1\port;..\..\..\..\..\lwip-1.4.1\port\Standalone;..\..\..\..\..\iperf\include;..\..\..\..\..\USB_Host_Linux_Convert\usb_host;..\..\..\..\..\USB_Host_Linux_Convert\usb_host\STM32_USB_OTG_Driver\inc;..\..\..\..\..\USB_Host_Linux_Convert\memory;..\..\..\..\..\USB_Host_Linux_Convert\object;..\App\src</IncludePath>
             </VariousControls>
@@ -403,14 +403,49 @@
               <FilePath>..\App\src\wlan.c</FilePath>
             </File>
             <File>
+              <FileName>ping.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\App\src\ping.c</FilePath>
+            </File>
+            <File>
+              <FileName>iwlib.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\App\src\iwlib.c</FilePath>
+            </File>
+            <File>
+              <FileName>iwpriv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\App\src\iwpriv.c</FilePath>
+            </File>
+            <File>
               <FileName>os_app_hooks.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\os_app_hooks.c</FilePath>
             </File>
             <File>
+              <FileName>shell.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\uC-Shell\Source\shell.c</FilePath>
+            </File>
+            <File>
               <FileName>app_cfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\app_cfg.h</FilePath>
+            </File>
+            <File>
+              <FileName>usb_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\usb_conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>rt2870sta_conf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\rt2870sta_conf.h</FilePath>
+            </File>
+            <File>
+              <FileName>lwipopts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\lwipopts.h</FilePath>
             </File>
             <File>
               <FileName>lib_cfg.h</FileName>
@@ -426,26 +461,6 @@
               <FileName>shell_cfg.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\shell_cfg.h</FilePath>
-            </File>
-            <File>
-              <FileName>lwipopts.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\lwipopts.h</FilePath>
-            </File>
-            <File>
-              <FileName>iwlib.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\App\src\iwlib.c</FilePath>
-            </File>
-            <File>
-              <FileName>iwpriv.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\App\src\iwpriv.c</FilePath>
-            </File>
-            <File>
-              <FileName>shell.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\uC-Shell\Source\shell.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -483,6 +498,11 @@
               <FilePath>..\..\BSP\OS\uCOS-III\bsp_os.c</FilePath>
             </File>
             <File>
+              <FileName>bsp_ser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\bsp_ser.c</FilePath>
+            </File>
+            <File>
               <FileName>delay.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BSP\delay.c</FilePath>
@@ -492,20 +512,105 @@
               <FileType>1</FileType>
               <FilePath>..\..\BSP\usb_bsp.c</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>STM32F4xx Library</GroupName>
+          <Files>
             <File>
-              <FileName>bsp_ser2.c</FileName>
+              <FileName>misc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\bsp_ser2.c</FilePath>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\misc.c</FilePath>
             </File>
             <File>
-              <FileName>mem_cvt.c</FileName>
+              <FileName>stm32f4xx_crc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\memory\mem_cvt.c</FilePath>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_crc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_dma2d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma2d.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_exti.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_fsmc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_fsmc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_rcc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rcc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rng.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_sdio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_sdio.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_syscfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_syscfg.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32f4xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BSP\ST\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>uC/CPU</GroupName>
+          <GroupName>uC-CPU</GroupName>
           <Files>
             <File>
               <FileName>cpu.h</FileName>
@@ -540,7 +645,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>uC/LIB</GroupName>
+          <GroupName>uC-LIB</GroupName>
           <Files>
             <File>
               <FileName>lib_ascii.c</FileName>
@@ -615,7 +720,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>uC/OS-III Source</GroupName>
+          <GroupName>uCOS-III Source</GroupName>
           <Files>
             <File>
               <FileName>os_cfg_app.c</FileName>
@@ -913,16 +1018,6 @@
               <FilePath>..\..\..\..\..\lwip-1.4.1\src\netif\etharp.c</FilePath>
             </File>
             <File>
-              <FileName>sys_arch.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\lwip-1.4.1\port\arch\sys_arch.c</FilePath>
-            </File>
-            <File>
-              <FileName>wlan_ethernetif.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\lwip-1.4.1\port\Standalone\wlan_ethernetif.c</FilePath>
-            </File>
-            <File>
               <FileName>tcp_out.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\lwip-1.4.1\src\core\tcp_out.c</FilePath>
@@ -930,97 +1025,17 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>STM32F4xx Library</GroupName>
+          <GroupName>lwip_port</GroupName>
           <Files>
             <File>
-              <FileName>misc.c</FileName>
+              <FileName>wlan_ethernetif.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\misc.c</FilePath>
+              <FilePath>..\..\..\..\..\lwip-1.4.1\port\Standalone\wlan_ethernetif.c</FilePath>
             </File>
             <File>
-              <FileName>stm32f4xx_crc.c</FileName>
+              <FileName>sys_arch.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_crc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_dma.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_dma2d.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma2d.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_exti.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_exti.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_flash.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_fsmc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_fsmc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_gpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_gpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_i2c.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_i2c.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_rcc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rcc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_rng.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rng.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_sdio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_sdio.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_spi.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_spi.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_syscfg.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_syscfg.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_tim.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_tim.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f4xx_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c</FilePath>
-            </File>
-            <File>
-              <FileName>system_stm32f4xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BSP\ST\CMSIS\Device\ST\STM32F4xx\Source\Templates\system_stm32f4xx.c</FilePath>
+              <FilePath>..\..\..\..\..\lwip-1.4.1\port\arch\sys_arch.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1028,19 +1043,14 @@
           <GroupName>USB_Linux_Convert</GroupName>
           <Files>
             <File>
-              <FileName>usbh_core.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\usbh_core.c</FilePath>
-            </File>
-            <File>
-              <FileName>usbh_hcs.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\usbh_hcs.c</FilePath>
-            </File>
-            <File>
               <FileName>usbh_ioreq.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\usbh_ioreq.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbh_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\usbh_core.c</FilePath>
             </File>
             <File>
               <FileName>usbh_linux.c</FileName>
@@ -1048,9 +1058,29 @@
               <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\usbh_linux.c</FilePath>
             </File>
             <File>
-              <FileName>usbh_stdreq.c</FileName>
+              <FileName>usbh_config.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\usbh_stdreq.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\usbh_config.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\STM32_USB_OTG_Driver\src\usb_core.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_hcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\STM32_USB_OTG_Driver\src\usb_hcd.c</FilePath>
+            </File>
+            <File>
+              <FileName>usb_hcd_int.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\STM32_USB_OTG_Driver\src\usb_hcd_int.c</FilePath>
+            </File>
+            <File>
+              <FileName>kref.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\kref.c</FilePath>
             </File>
             <File>
               <FileName>atomic.c</FileName>
@@ -1088,6 +1118,11 @@
               <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\sem.c</FilePath>
             </File>
             <File>
+              <FileName>mutex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\mutex.c</FilePath>
+            </File>
+            <File>
               <FileName>tasklet.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\tasklet.c</FilePath>
@@ -1097,25 +1132,10 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\object\timer.c</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>STM32_USB_OTG_Driver</GroupName>
-          <Files>
             <File>
-              <FileName>usb_core.c</FileName>
+              <FileName>mem_cvt.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\STM32_USB_OTG_Driver\src\usb_core.c</FilePath>
-            </File>
-            <File>
-              <FileName>usb_hcd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\STM32_USB_OTG_Driver\src\usb_hcd.c</FilePath>
-            </File>
-            <File>
-              <FileName>usb_hcd_int.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\usb_host\STM32_USB_OTG_Driver\src\usb_hcd_int.c</FilePath>
+              <FilePath>..\..\..\..\..\USB_Host_Linux_Convert\memory\mem_cvt.c</FilePath>
             </File>
           </Files>
         </Group>

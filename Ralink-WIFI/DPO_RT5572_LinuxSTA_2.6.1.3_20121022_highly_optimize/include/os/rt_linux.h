@@ -1133,9 +1133,9 @@ void linux_pci_unmap_single(void *handle, ra_dma_addr_t dma_addr, size_t size, i
 
 
 #if defined(CONFIG_MULTI_CHANNEL) || defined(DOT11Z_TDLS_SUPPORT)
-#define MAX_PACKETS_IN_QUEUE				(2048)
+#define MAX_PACKETS_IN_QUEUE				(3) //(2048)
 #else /* defined(CONFIG_MULTI_CHANNEL) || defined(DOT11Z_TDLS_SUPPORT) */
-#define MAX_PACKETS_IN_QUEUE				(512)
+#define MAX_PACKETS_IN_QUEUE				(3) //(512)
 #endif /* !CONFIG_MULTI_CHANNEL */
 
 

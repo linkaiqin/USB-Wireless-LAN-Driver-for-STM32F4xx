@@ -30,7 +30,6 @@
 #define __USB_DEF_H__
 
 /* Includes ------------------------------------------------------------------*/
-#include  "usb_conf.h"
 
 /** @addtogroup USB_OTG_DRIVER
   * @{
@@ -160,6 +159,8 @@
 #define HC_PID_DATA2                           1
 #define HC_PID_DATA1                           2
 #define HC_PID_SETUP                           3
+#define HC_PID_MDATA                           3
+
 
 #define HPRT0_PRTSPD_HIGH_SPEED                0
 #define HPRT0_PRTSPD_FULL_SPEED                1
@@ -181,41 +182,6 @@
   */
 
 
-/** @defgroup USB_DEFINES_Exported_Types
-  * @{
-  */ 
-
-typedef enum
-{
-  USB_OTG_HS_CORE_ID = 0,
-  USB_OTG_FS_CORE_ID = 1
-}USB_OTG_CORE_ID_TypeDef;
-/**
-  * @}
-  */ 
-
-
-/** @defgroup USB_DEFINES_Exported_Macros
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USB_DEFINES_Exported_Variables
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USB_DEFINES_Exported_FunctionsPrototype
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
 
 /** @defgroup Internal_Macro's
   * @{
@@ -228,12 +194,6 @@ typedef enum
 /********************************************************************************
                               ENUMERATION TYPE
 ********************************************************************************/
-enum USB_OTG_SPEED {
-  USB_SPEED_UNKNOWN = 0,
-  USB_SPEED_LOW,
-  USB_SPEED_FULL,
-  USB_SPEED_HIGH
-};
 
 #endif //__USB_DEFINES__H__
 

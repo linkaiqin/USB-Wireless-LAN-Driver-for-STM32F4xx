@@ -363,6 +363,8 @@ sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread , void *arg,
                  (OS_OPT      )(OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR),
                  (OS_ERR     *)&err);  
 
+    if(err != OS_ERR_NONE)
+        LWIP_DEBUGF(SYS_DEBUG, ("sys_thread_new: OSTaskCreate failed:%d \n", err));            
 
     return tcb;
 }
@@ -383,7 +385,19 @@ sys_msleep(u32_t ms)
               &err);
 }
 
+/** Ticks/jiffies since power up. */
+u32_t sys_jiffies(void)
+{
+    OS_ERR err;
+    
+    return OSTimeGet(&err);
+}
 
-
+/** Returns the current time in milliseconds,
+ * may be the same as sys_jiffies or at least based on it. */
+u32_t sys_now(void)
+{
+    return sys_jiffies();
+}
 
 

@@ -1,6 +1,7 @@
 #define USBH_DEBUG_LEVEL USBH_DEBUG_ERROR
 #include "os.h"
-#include "usbh_config.h"
+#include "usbh_debug.h"
+#include "usb_conf.h"
 #include "kthread.h"
 #include "memory.h"
 #include "list.h"
@@ -9,9 +10,6 @@
 #define KERNEL_THREAD_USE_POOL
 #define KERNEL_THREAD_NUM_MAX           3
 
-
-#define KERNEL_THREAD_STK_SIZE         512
-#define KERNEL_THREAD_PRIO_BEGIN        15
 
 
 #ifdef KERNEL_THREAD_USE_POOL
@@ -171,6 +169,9 @@ void kthread_exit(long code)
     task  = container_of(tcb,struct task_struct,tcb);
     USBH_TRACE("thread_exit %s\r\n",task->name); 
     OSTaskDel(0,&task->exit_err);
+    if(task->exit_err)
+        USBH_DBG("task:%s exit failed:%d\r\n", task->name, task->exit_err);
+    kthread_del(task);
 }
 
 

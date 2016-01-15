@@ -18,6 +18,7 @@ int _down_interruptible(struct semaphore *sem);
 void _up(struct semaphore *sem);
 void _sema_destroy(struct semaphore *sem);
 int down_trylock(struct semaphore *sem);
+void down(struct semaphore *sem);
 
 
 #define init_MUTEX(sem)		sema_init(sem, 1)

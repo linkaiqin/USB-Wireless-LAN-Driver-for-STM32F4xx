@@ -1,11 +1,11 @@
 #include "os.h"
-#include "usbh_config.h"
+#include "usbh_debug.h"
+#include "usb_conf.h"
 #include "irq.h"
 #include "tasklet.h"
 #include "bitops.h"
 
-#define TASKLET_ACTION_TASK_STK_SIZE   384
-#define TASKLET_ACTION_TASK_PRIO        13
+
 
 
 #define TASKLET_STATE_UNSCHED     0
@@ -96,7 +96,7 @@ void tasklet_action(void *p_arg)
         }
 
         
-        OSSchedLock(&err);
+//        OSSchedLock(&err);
         CPU_CRITICAL_ENTER();
         if(t->state == TASKLET_STATE_UNSCHED)
             USBH_DBG("tasklet_action Error at %d\r\n",__LINE__);
@@ -104,7 +104,7 @@ void tasklet_action(void *p_arg)
         CPU_CRITICAL_EXIT();      
         
         t->func(t->data);
-        OSSchedUnlock(&err);
+//        OSSchedUnlock(&err);
     }
 
 }

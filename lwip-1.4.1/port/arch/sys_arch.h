@@ -42,7 +42,7 @@
 #define LWIP_THREAD_STK_SIZE  512
 
 #define LWIP_COMPAT_MUTEX 0
-#define sys_msleep      sys_msleep
+#define sys_msleep      sys_ms_delay
 
 #define SYS_ARCH_DECL_PROTECT(lev)  CPU_SR cpu_sr
 #define SYS_ARCH_PROTECT(lev)       CPU_CRITICAL_ENTER()
@@ -53,6 +53,10 @@ typedef OS_SEM sys_sem_t;
 typedef OS_MUTEX sys_mutex_t;
 typedef OS_Q  sys_mbox_t;
 typedef OS_TCB* sys_thread_t;
+
+
+#define SYS_MBOX_NULL (sys_mbox_t *)NULL 
+#define SYS_SEM_NULL  (sys_sem_t *)NULL
 
 
 #endif /* __SYS_UCOS_III_H__ */

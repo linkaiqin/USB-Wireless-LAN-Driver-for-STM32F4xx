@@ -3,7 +3,7 @@
 
 
 
-
+#include "os.h"
 
 
 /*
@@ -98,13 +98,24 @@ ____atomic_test_and_change_bit(unsigned int bit, volatile unsigned long *p)
 	return res & mask;
 }
 
+#define BITS_PER_LONG 32
+#define BIT_WORD(nr)		((nr) / BITS_PER_LONG)
+
+/**
+ * test_bit - Determine whether a bit is set
+ * @nr: bit number to test
+ * @addr: Address to start counting from
+ */
+static inline int test_bit(int nr, const volatile unsigned long *addr)
+{
+	return 1UL & (addr[BIT_WORD(nr)] >> (nr & (BITS_PER_LONG-1)));
+}
 
 
 
 
 
-
-#define ATOMIC_BITOP_LE(name,nr,p)	_##name##_le(nr,p)
+#define ATOMIC_BITOP_LE(name,nr,p)	____atomic_##name(nr,p)
 
 /*
  * These are the little endian, atomic definitions.

@@ -16,23 +16,21 @@
   *
   *        http://www.st.com/software_license_agreement_liberty_v2
   *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS,
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
   *
   ******************************************************************************
-  */ 
+  */
 
 /* Includes ------------------------------------------------------------------*/
 
-#include "usb_bsp.h"
 #include "bsp.h"
-#include "usbh_linux.h"
-#include "usb_hcd_int.h"
+#include "usb_bsp.h"
 
-extern struct usb_device _usb_device;
+
 /** @addtogroup USBH_USER
 * @{
 */
@@ -40,80 +38,60 @@ extern struct usb_device _usb_device;
 /** @defgroup USB_BSP
   * @brief This file is responsible to offer board support package
   * @{
-  */ 
+  */
 
 /** @defgroup USB_BSP_Private_Defines
   * @{
-  */ 
+  */
 
-#define TIM_MSEC_DELAY                     0x01
-#define TIM_USEC_DELAY                     0x02
-#define HOST_OVRCURR_PORT                  GPIOE
-#define HOST_OVRCURR_LINE                  GPIO_Pin_1
-#define HOST_OVRCURR_PORT_SOURCE           GPIO_PortSourceGPIOE
-#define HOST_OVRCURR_PIN_SOURCE            GPIO_PinSource1
-#define HOST_OVRCURR_PORT_RCC              RCC_APB2Periph_GPIOE
-#define HOST_OVRCURR_EXTI_LINE             EXTI_Line1
-#define HOST_OVRCURR_IRQn                  EXTI1_IRQn 
 
-#ifdef USE_STM3210C_EVAL
- #define HOST_POWERSW_PORT_RCC             RCC_APB2Periph_GPIOC
- #define HOST_POWERSW_PORT                 GPIOC
- #define HOST_POWERSW_VBUS                 GPIO_Pin_9
-#else
- #ifdef USE_USB_OTG_FS 
-  #define HOST_POWERSW_PORT_RCC            RCC_AHB1Periph_GPIOC
-  #define HOST_POWERSW_PORT                GPIOC
-  #define HOST_POWERSW_VBUS                GPIO_Pin_0
- #endif
+#ifdef USE_USB_OTG_FS
+#define HOST_POWERSW_PORT_RCC            RCC_AHB1Periph_GPIOC
+#define HOST_POWERSW_PORT                GPIOC
+#define HOST_POWERSW_VBUS                GPIO_Pin_0
 #endif
-
-#define HOST_SOF_OUTPUT_RCC                RCC_APB2Periph_GPIOA
-#define HOST_SOF_PORT                      GPIOA
-#define HOST_SOF_SIGNAL                    GPIO_Pin_8
 
 /**
   * @}
-  */ 
+  */
 
 
 /** @defgroup USB_BSP_Private_TypesDefinitions
   * @{
-  */ 
+  */
 /**
   * @}
-  */ 
+  */
 
 
 
 /** @defgroup USB_BSP_Private_Macros
   * @{
-  */ 
+  */
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup USBH_BSP_Private_Variables
   * @{
-  */ 
-ErrorStatus HSEStartUpStatus;
+  */
 
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup USBH_BSP_Private_FunctionPrototypes
   * @{
-  */ 
+  */
 
 
 /**
   * @}
-  */ 
+  */
 
 /** @defgroup USB_BSP_Private_Functions
   * @{
-  */ 
+  */
 
 /**
   * @brief  USB_OTG_BSP_Init
@@ -122,164 +100,64 @@ ErrorStatus HSEStartUpStatus;
   * @retval None
   */
 
-void USB_OTG_BSP_Init(USB_OTG_CORE_HANDLE *pdev)
+void USB_OTG_BSP_Init(int coreID)
 {
+    GPIO_InitTypeDef GPIO_InitStructure;
 
-// EXTI_InitTypeDef EXTI_InitStructure;
- #ifdef USE_STM3210C_EVAL
+#ifdef USB_OTG_FS_CORE  
+    if(coreID == USB_OTG_FS_CORE_ID)
+    {
 
-  RCC_OTGFSCLKConfig(RCC_OTGFSCLKSource_PLLVCO_Div3);
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_OTG_FS, ENABLE) ;
+        RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOA , ENABLE);
 
-#else // USE_STM322xG_EVAL  
-  GPIO_InitTypeDef GPIO_InitStructure;
- #ifdef USE_USB_OTG_FS 
+        //PA.11-->D-
+        //PA.12-->D+
+        GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 |
+                                      GPIO_Pin_12;
 
-  RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOA , ENABLE);  
-  
-  /* Configure SOF VBUS ID DM DP Pins */
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8  | 
-                                GPIO_Pin_11 | 
-                                GPIO_Pin_12;
-  
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-  GPIO_Init(GPIOA, &GPIO_InitStructure);  
-  
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
-  
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-  GPIO_Init(GPIOA, &GPIO_InitStructure);    
-  
-  GPIO_PinAFConfig(GPIOA,GPIO_PinSource8,GPIO_AF_OTG1_FS) ;
-  GPIO_PinAFConfig(GPIOA,GPIO_PinSource11,GPIO_AF_OTG1_FS) ; 
-  GPIO_PinAFConfig(GPIOA,GPIO_PinSource12,GPIO_AF_OTG1_FS) ;
-  
-  /* this for ID line debug */
-  
-  
-  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_10;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;  
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_Init(GPIOA, &GPIO_InitStructure);  
-  GPIO_PinAFConfig(GPIOA,GPIO_PinSource10,GPIO_AF_OTG1_FS) ;   
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+        GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+        GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+        GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+        GPIO_PinAFConfig(GPIOA,GPIO_PinSource11,GPIO_AF_OTG1_FS) ;
+        GPIO_PinAFConfig(GPIOA,GPIO_PinSource12,GPIO_AF_OTG1_FS) ;
+
+        RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+        RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_OTG_FS, ENABLE) ;
+    }
+#endif
+    
+#ifdef USB_OTG_HS_CORE       
+    if(coreID == USB_OTG_HS_CORE_ID) 
+    {
+        RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB , ENABLE);
+        
+        //PB.14-->D-
+        //PB.15-->D+
+        GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14 |    
+                                      GPIO_Pin_15;
+
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+        GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//new add,prevent assert faild
+        GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ; //new add,prevent assert faild
+        GPIO_Init(GPIOB, &GPIO_InitStructure);
 
 
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
-  RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_OTG_FS, ENABLE) ; 
- #else // USE_USB_OTG_HS 
-
-  #ifdef USE_ULPI_PHY // ULPI
-  RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOB | 
-                         RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOH | 
-                           RCC_AHB1Periph_GPIOI, ENABLE);    
-  
-  
-  GPIO_PinAFConfig(GPIOA,GPIO_PinSource3, GPIO_AF_OTG2_HS) ; // D0
-  GPIO_PinAFConfig(GPIOA,GPIO_PinSource5, GPIO_AF_OTG2_HS) ; // CLK
-  GPIO_PinAFConfig(GPIOB,GPIO_PinSource0, GPIO_AF_OTG2_HS) ; // D1
-  GPIO_PinAFConfig(GPIOB,GPIO_PinSource1, GPIO_AF_OTG2_HS) ; // D2
-  GPIO_PinAFConfig(GPIOB,GPIO_PinSource5, GPIO_AF_OTG2_HS) ; // D7
-  GPIO_PinAFConfig(GPIOB,GPIO_PinSource10,GPIO_AF_OTG2_HS) ; // D3
-  GPIO_PinAFConfig(GPIOB,GPIO_PinSource11,GPIO_AF_OTG2_HS) ; // D4
-  GPIO_PinAFConfig(GPIOB,GPIO_PinSource12,GPIO_AF_OTG2_HS) ; // D5
-  GPIO_PinAFConfig(GPIOB,GPIO_PinSource13,GPIO_AF_OTG2_HS) ; // D6
-  GPIO_PinAFConfig(GPIOC,GPIO_PinSource3, GPIO_AF_OTG2_HS) ; // NXT
-  GPIO_PinAFConfig(GPIOC,GPIO_PinSource2,GPIO_AF_OTG2_HS) ; // DIR
-  GPIO_PinAFConfig(GPIOC,GPIO_PinSource0, GPIO_AF_OTG2_HS) ; // STP
-  
-  // CLK
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 ; 
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//new add,prevent assert faild 
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;//new add,prevent assert faild 
-  GPIO_Init(GPIOA, &GPIO_InitStructure);  
-  
-  // D0
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3  ; 
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-  GPIO_Init(GPIOA, &GPIO_InitStructure);  
-  
-  
-  
-  // D1 D2 D3 D4 D5 D6 D7
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1  |
-    GPIO_Pin_5 | GPIO_Pin_10 | 
-      GPIO_Pin_11| GPIO_Pin_12 | 
-        GPIO_Pin_13 ;
-  
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-  GPIO_Init(GPIOB, &GPIO_InitStructure);  
-  
-  
-  // STP
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0  ;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_Init(GPIOC, &GPIO_InitStructure);  
-  
-  //NXT  
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_Init(GPIOC, &GPIO_InitStructure);  
-  
-  
-  //DIR
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2 ; 
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_Init(GPIOC, &GPIO_InitStructure);  
-  
-  
-  RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_OTG_HS | 
-                         RCC_AHB1Periph_OTG_HS_ULPI, ENABLE) ;    
-   
-  #else
-
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB , ENABLE);
-  
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12  | 
-    GPIO_Pin_13 |
-      GPIO_Pin_14 | 
-        GPIO_Pin_15;
-  
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//new add,prevent assert faild 
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ; //new add,prevent assert faild 
-  GPIO_Init(GPIOB, &GPIO_InitStructure);  
-  
-  GPIO_PinAFConfig(GPIOB,GPIO_PinSource12, GPIO_AF_OTG2_FS) ; 
-  GPIO_PinAFConfig(GPIOB,GPIO_PinSource13,GPIO_AF_OTG2_FS) ; 
-  GPIO_PinAFConfig(GPIOB,GPIO_PinSource14,GPIO_AF_OTG2_FS) ; 
-  GPIO_PinAFConfig(GPIOB,GPIO_PinSource15,GPIO_AF_OTG2_FS) ;
-  RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_OTG_HS, ENABLE) ;  
-  
-  #endif
- #endif //USB_OTG_HS
-#endif //USE_STM322xG_EVAL
-
-  /* Intialize Timer for delay function */
-//   USB_OTG_BSP_TimeInit();   
+        GPIO_PinAFConfig(GPIOB,GPIO_PinSource14,GPIO_AF_OTG2_FS) ;
+        GPIO_PinAFConfig(GPIOB,GPIO_PinSource15,GPIO_AF_OTG2_FS) ;
+        RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_OTG_HS, ENABLE) ;
+    }
+#endif
+    /* Intialize Timer for delay function */
+//   USB_OTG_BSP_TimeInit();
 }
 
-void OTG_ISR_Handler(void)
+void OTG_ISR_Handler(void *p_obj)
 {
-  USBH_OTG_ISR_Handler(&_usb_device.USB_OTG_Core);
+    USBH_OTG_ISR_Handler(p_obj);
 }
 
 /**
@@ -288,33 +166,24 @@ void OTG_ISR_Handler(void)
   * @param  None
   * @retval None
   */
-void USB_OTG_BSP_EnableInterrupt(USB_OTG_CORE_HANDLE *pdev)
+void USB_OTG_BSP_EnableInterrupt(void *otg_handle, int coreID)
 {
-//  NVIC_InitTypeDef NVIC_InitStructure; 
-//  
-//  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 
-#ifdef USE_USB_OTG_HS   
-  BSP_IntVectSet(BSP_INT_ID_OTG_HS,OTG_ISR_Handler);
-  BSP_IntEn(BSP_INT_ID_OTG_HS);
-
-#else
-  BSP_IntVectSet(BSP_INT_ID_OTG_FS,OTG_ISR_Handler);
-  BSP_IntEn(BSP_INT_ID_OTG_FS);
-
+#ifdef USB_OTG_FS_CORE     
+    if(coreID == USB_OTG_FS_CORE_ID)
+    {
+        BSP_IntVectSetEx(BSP_INT_ID_OTG_FS,OTG_ISR_Handler, otg_handle);
+        BSP_IntEn(BSP_INT_ID_OTG_FS);
+    }
 #endif
-
-  
-//#ifdef USE_USB_OTG_HS   
-//  NVIC_InitStructure.NVIC_IRQChannel = OTG_HS_IRQn;
-//#else
-//  NVIC_InitStructure.NVIC_IRQChannel = OTG_FS_IRQn;  
-//#endif
-//  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-//  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
-//  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-//  NVIC_Init(&NVIC_InitStructure);  
-
+    
+#ifdef USB_OTG_HS_CORE  
+    if(coreID == USB_OTG_HS_CORE_ID)
+    {
+        BSP_IntVectSetEx(BSP_INT_ID_OTG_HS,OTG_ISR_Handler, otg_handle);
+        BSP_IntEn(BSP_INT_ID_OTG_HS);
+    }
+#endif
 }
 
 /**
@@ -324,33 +193,35 @@ void USB_OTG_BSP_EnableInterrupt(USB_OTG_CORE_HANDLE *pdev)
   * @retval None
   */
 
-void USB_OTG_BSP_DriveVBUS(USB_OTG_CORE_HANDLE *pdev, uint8_t state)
+void USB_OTG_BSP_DriveVBUS(uint8_t state, int coreID)
 {
-  /*
-  On-chip 5 V VBUS generation is not supported. For this reason, a charge pump 
-  or, if 5 V are available on the application board, a basic power switch, must 
-  be added externally to drive the 5 V VBUS line. The external charge pump can 
-  be driven by any GPIO output. When the application decides to power on VBUS 
-  using the chosen GPIO, it must also set the port power bit in the host port 
-  control and status register (PPWR bit in OTG_FS_HPRT).
-  
-  Bit 12 PPWR: Port power
-  The application uses this field to control power to this port, and the core 
-  clears this bit on an overcurrent condition.
-  */
-  
-#ifndef USE_USB_OTG_HS   
-  if (0 == state)
-  { 
-    /* DISABLE is needed on output of the Power Switch */
-    GPIO_SetBits(HOST_POWERSW_PORT, HOST_POWERSW_VBUS);
-  }
-  else
-  {
-    /*ENABLE the Power Switch by driving the Enable LOW */
-    GPIO_ResetBits(HOST_POWERSW_PORT, HOST_POWERSW_VBUS);
-  }
-#endif  
+    /*
+    On-chip 5 V VBUS generation is not supported. For this reason, a charge pump
+    or, if 5 V are available on the application board, a basic power switch, must
+    be added externally to drive the 5 V VBUS line. The external charge pump can
+    be driven by any GPIO output. When the application decides to power on VBUS
+    using the chosen GPIO, it must also set the port power bit in the host port
+    control and status register (PPWR bit in OTG_FS_HPRT).
+
+    Bit 12 PPWR: Port power
+    The application uses this field to control power to this port, and the core
+    clears this bit on an overcurrent condition.
+    */
+#ifdef USB_OTG_FS_CORE 
+    if(coreID == USB_OTG_FS_CORE_ID)
+    {
+        if (0 == state)
+        {
+            /* DISABLE is needed on output of the Power Switch */
+            GPIO_SetBits(HOST_POWERSW_PORT, HOST_POWERSW_VBUS);
+        }
+        else
+        {
+            /*ENABLE the Power Switch by driving the Enable LOW */
+            GPIO_ResetBits(HOST_POWERSW_PORT, HOST_POWERSW_VBUS);
+        }
+    }
+#endif     
 }
 
 /**
@@ -360,59 +231,51 @@ void USB_OTG_BSP_DriveVBUS(USB_OTG_CORE_HANDLE *pdev, uint8_t state)
   * @retval None
   */
 
-void  USB_OTG_BSP_ConfigVBUS(USB_OTG_CORE_HANDLE *pdev)
+void  USB_OTG_BSP_ConfigVBUS(int coreID)
 {
-#ifndef USE_USB_OTG_HS 
-  GPIO_InitTypeDef GPIO_InitStructure; 
-  
-#ifdef USE_STM3210C_EVAL
-  RCC_APB2PeriphClockCmd(HOST_POWERSW_PORT_RCC, ENABLE);
-  
-  
-  /* Configure Power Switch Vbus Pin */
-  GPIO_InitStructure.GPIO_Pin = HOST_POWERSW_VBUS;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-  GPIO_Init(HOST_POWERSW_PORT, &GPIO_InitStructure);
-#else
-  #ifdef USE_USB_OTG_FS  
-  RCC_AHB1PeriphClockCmd( HOST_POWERSW_PORT_RCC , ENABLE);  
-  
-  GPIO_InitStructure.GPIO_Pin = HOST_POWERSW_VBUS;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-  GPIO_Init(HOST_POWERSW_PORT,&GPIO_InitStructure);
-  #endif  
-#endif
+#ifdef USB_OTG_FS_CORE        
+    if(coreID == USB_OTG_FS_CORE_ID)
+    {
+        GPIO_InitTypeDef GPIO_InitStructure;
 
-  /* By Default, DISABLE is needed on output of the Power Switch */
-  GPIO_SetBits(HOST_POWERSW_PORT, HOST_POWERSW_VBUS);
-  
-  USB_OTG_BSP_mDelay(200);   /* Delay is need for stabilising the Vbus Low 
-  in Reset Condition, when Vbus=1 and Reset-button is pressed by user */
-#endif  
+        RCC_AHB1PeriphClockCmd( HOST_POWERSW_PORT_RCC , ENABLE);
+
+        GPIO_InitStructure.GPIO_Pin = HOST_POWERSW_VBUS;
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+        GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+        GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+        GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+        GPIO_Init(HOST_POWERSW_PORT,&GPIO_InitStructure);
+
+
+        /* By Default, DISABLE is needed on output of the Power Switch */
+        GPIO_SetBits(HOST_POWERSW_PORT, HOST_POWERSW_VBUS);
+
+        USB_OTG_BSP_mDelay(200);   /* Delay is need for stabilising the Vbus Low
+         in Reset Condition, when Vbus=1 and Reset-button is pressed by user */
+
+    }
+#endif     
 }
 
 
 
 void USB_OTG_BSP_uDelay (const uint32_t usec)
 {
-  
 
-  __IO uint32_t count = 0;
-  const uint32_t utime = (120 * usec / 7);
-  do
-  {
-    if ( ++count > utime )
+
+    __IO uint32_t count = 0;
+    const uint32_t utime = (120 * usec / 7);
+    do
     {
-      return ;
+        if ( ++count > utime )
+        {
+            return ;
+        }
     }
-  }
-  while (1);
-  
-  
+    while (1);
+
+
 }
 
 #include "delay.h"
@@ -424,7 +287,7 @@ void USB_OTG_BSP_uDelay (const uint32_t usec)
   * @retval None
   */
 void USB_OTG_BSP_mDelay (const uint32_t msec)
-{ 
+{
     delay_ms(msec);
 //    BSP_OS_TimeDlyMs(msec);
 }
@@ -433,11 +296,11 @@ void USB_OTG_BSP_mDelay (const uint32_t msec)
 
 /**
 * @}
-*/ 
+*/
 
 /**
 * @}
-*/ 
+*/
 
 /**
 * @}

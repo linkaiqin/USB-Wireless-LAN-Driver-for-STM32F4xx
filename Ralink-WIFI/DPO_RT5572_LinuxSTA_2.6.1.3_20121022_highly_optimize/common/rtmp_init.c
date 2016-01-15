@@ -185,6 +185,7 @@ NDIS_SPIN_LOCK TimerSemLock;
 */
 #ifdef HIGHLY_OPTIMIZE
 unsigned char __BeaconBuf[MAX_BEACON_SIZE];
+unsigned char __ProbeRespIE[MAX_LEN_OF_BSS_TABLE][MAX_VIE_LEN];
 #endif
 
 NDIS_STATUS	RTMPAllocAdapterBlock(
@@ -195,6 +196,18 @@ NDIS_STATUS	RTMPAllocAdapterBlock(
 	NDIS_STATUS		Status;
 	INT 			index;
 	UCHAR			*pBeaconBuf = NULL;
+
+#ifdef HIGHLY_OPTIMIZE
+{
+    extern RTMP_ADAPTER _adapter;
+    //Check if more than one usb device may be pluged.
+    if(_adapter.OS_Cookie != NULL)
+    {
+        DBGPRINT(RT_DEBUG_ERROR, ("two or more ralink usb device may be pluged\n"));        
+        return -ENOMEM;
+    }
+}
+#endif
 
 
 #ifdef OS_ABL_FUNC_SUPPORT
@@ -324,10 +337,14 @@ NDIS_STATUS	RTMPAllocAdapterBlock(
 	*/
 	for (index = 0; index < MAX_LEN_OF_BSS_TABLE; index++) 
 	{
+#ifdef HIGHLY_OPTIMIZE
+        pAd->ProbeRespIE[index].pIe = &__ProbeRespIE[index][0];
+#else
 		if (os_alloc_mem(pAd,&pAd->ProbeRespIE[index].pIe, MAX_VIE_LEN) == NDIS_STATUS_SUCCESS)
 			RTMPZeroMemory(pAd->ProbeRespIE[index].pIe, MAX_VIE_LEN);
 		else
 			pAd->ProbeRespIE[index].pIe = NULL;
+#endif        
 	}	
 
 	DBGPRINT_S(Status, ("<-- RTMPAllocAdapterBlock, Status=%x\n", Status));
@@ -3800,9 +3817,7 @@ static INT RtmpChipOpsRegister(
 	return status;
 }
 
-#ifdef HIGHLY_OPTIMIZE
-unsigned char UsbVendorReqBuf[MAX_PARAM_BUFFER_SIZE-1];
-#endif
+
 
 INT RtmpRaDevCtrlInit(
 	IN	VOID			*pAdSrc,
@@ -3824,16 +3839,14 @@ INT RtmpRaDevCtrlInit(
 #ifdef RTMP_MAC_USB
 	RTMP_SEM_EVENT_INIT(&(pAd->UsbVendorReq_semaphore), &pAd->RscSemMemList);
 	RTMP_SEM_EVENT_INIT(&(pAd->reg_atomic), &pAd->RscSemMemList);
-#ifdef HIGHLY_OPTIMIZE
-    pAd->UsbVendorReqBuf = &UsbVendorReqBuf[0];
-#else
+#ifndef HIGHLY_OPTIMIZE
 	os_alloc_mem(pAd, (PUCHAR *)&pAd->UsbVendorReqBuf, MAX_PARAM_BUFFER_SIZE - 1);
-#endif
 	if (pAd->UsbVendorReqBuf == NULL)
 	{
 		DBGPRINT(RT_DEBUG_ERROR, ("Allocate vendor request temp buffer failed!\n"));
 		return FALSE;
 	}
+#endif    
 #if defined(CONFIG_MULTI_CHANNEL) || defined(DOT11Z_TDLS_SUPPORT)
 	RTMP_SEM_EVENT_INIT(&(pAd->MultiChannelLock), &pAd->RscSemMemList);
 #endif /* defined(CONFIG_MULTI_CHANNEL) || defined(DOT11Z_TDLS_SUPPORT) */
@@ -3910,8 +3923,10 @@ extern UINT8  MC_CardUsed[MAX_NUM_OF_MULTIPLE_CARD];
 	*/
 	for (index = 0; index < MAX_LEN_OF_BSS_TABLE; index++) 
 	{
+#ifndef HIGHLY_OPTIMIZE        
 		if (pAd->ProbeRespIE[index].pIe)
 			os_free_mem(pAd, pAd->ProbeRespIE[index].pIe);
+#endif          
 	}
 
 #ifdef RESOURCE_PRE_ALLOC

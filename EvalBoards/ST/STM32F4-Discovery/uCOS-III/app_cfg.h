@@ -53,15 +53,9 @@
 *********************************************************************************************************
 */
 
+#define  APP_TASK_START_PRIO                        12u 
 
 
-#define  APP_TASK_START_PRIO                        15u 
-
-#define  FTPD_TASK_PRIO                             15u 
-#define  USBH_TASK_PRIO                             17u 
-#define  USBH_PROBE_TASK_PRIO                      16u
-
-//#define  TTCP_OS_CFG_TASK_PRIO                      4
 /*
 *********************************************************************************************************
 *                                            TASK STACK SIZES
@@ -69,33 +63,6 @@
 */
 
 #define  APP_TASK_START_STK_SIZE                        512u
-
-#define  USBH_TASK_STK_SIZE                              256u
-#define  USBH_PROBE_TASK_STK_SIZE                        512u
-
-#define FTPD_TASK_STK_SIZE  768
-
-//#define  TTCP_OS_CFG_TASK_STK_SIZE                       768
-
-
-/*
-*********************************************************************************************************
-*                                                 TTCP
-*********************************************************************************************************
-*/
-
-// #define  TTCP_CFG_MAX_ACCEPT_TIMEOUT_MS                 5000    /* Maximum inactivity time (ms) on ACCEPT.              */
-// #define  TTCP_CFG_MAX_CONN_TIMEOUT_MS                   5000    /* Maximum inactivity time (ms) on CONNECT.             */
-// #define  TTCP_CFG_MAX_RX_TIMEOUT_MS                     5000    /* Maximum inactivity time (ms) on RX.                  */
-// #define  TTCP_CFG_MAX_TX_TIMEOUT_MS                     5000    /* Maximum inactivity time (ms) on TX.                  */
-
-// #define  TTCP_CFG_MAX_ACCEPT_RETRY                         3    /* Maximum number of retries on ACCEPT.                 */
-// #define  TTCP_CFG_MAX_CONN_RETRY                           3    /* Maximum number of retries on CONNECT.                */
-// #define  TTCP_CFG_MAX_RX_RETRY                             3    /* Maximum number of retries on RX.                     */
-// #define  TTCP_CFG_MAX_TX_RETRY                             3    /* Maximum number of retries on TX.                     */
-
-// #define  TTCP_CFG_BUF_LEN                               2048    /* Buffer length.                                       */
-
 
 
 

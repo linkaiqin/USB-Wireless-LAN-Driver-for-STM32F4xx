@@ -24,62 +24,57 @@
   *
   ******************************************************************************
   */
-
-/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __USB_CONF__H__
 #define __USB_CONF__H__
 
-#include "stm32f4xx.h"
-/* Includes ------------------------------------------------------------------*/
-// #if defined (USE_STM322xG_EVAL)
-//  #include "stm322xg_eval.h"
-//  #include "stm322xg_eval_lcd.h"
-//  #include "stm322xg_eval_ioe.h"
-//  #include "stm322xg_eval_sdio_sd.h"
-// #elif defined(USE_STM324xG_EVAL)
-//  #include "stm32f4xx.h"
-//  #include "stm324xg_eval.h" 
-//  #include "stm324xg_eval_lcd.h"
-//  #include "stm324xg_eval_ioe.h"
-//  #include "stm324xg_eval_sdio_sd.h"
-// #elif defined (USE_STM3210C_EVAL)
-//  #include "stm32f10x.h"
-//  #include "stm3210c_eval.h" 
-//  #include "stm3210c_eval_lcd.h"
-//  #include "stm3210c_eval_ioe.h"
-//  #include "stm3210c_eval_spi_sd.h"
-// #else
-//  #error "Missing define: Evaluation board (ie. USE_STM322xG_EVAL)"
-// #endif
 
-/** @addtogroup USB_OTG_DRIVER
-  * @{
-  */
-  
-/** @defgroup USB_CONF
-  * @brief USB low level driver configuration file
-  * @{
-  */ 
+/* Use OTG FS or OTG HS, the corresponding low level hard 
+ * should be initialized in usb_bsp.c.*/
+#define USE_USB_OTG_FS
+#define USE_USB_OTG_HS
 
-/** @defgroup USB_CONF_Exported_Defines
-  * @{
-  */ 
 
-/* USB Core and PHY interface configuration.
-   Tip: To avoid modifying these defines each time you need to change the USB
-        configuration, you can declare the needed define in your toolchain
-        compiler preprocessor.
-   */
+
+/*usb host core schedule task, the prio can be lower*/
+#define  USBH_TASK_PRIO                       16u 
+/*usb probe driver task that is used for usb device pluged in or out*/
+#define  USBH_PROBE_TASK_PRIO                 15u
+/*Task prio of thread created by usb wireless driver*/
+#define  KERNEL_THREAD_PRIO_BEGIN             14u
+/*Task prio of tasklet action used for usb wireless driver, it should be higher*/
+#define  TASKLET_ACTION_TASK_PRIO             10u
+
+
+
+/*Be careful to modified the size of stack below*/
+#define  USBH_TASK_STK_SIZE                   128u
+#define  USBH_PROBE_TASK_STK_SIZE             512u
+#define  KERNEL_THREAD_STK_SIZE               512u
+#define  TASKLET_ACTION_TASK_STK_SIZE         256u
+
+
+
+/*USE DMA mode in USB HS*/
+#define USB_OTG_HS_INTERNAL_DMA_ENABLED
+
+
+/* USB HS only support embedded phy in current version.
+ * Don't remove it.*/
+#define USE_EMBEDDED_PHY
+
+
+
+
+
+
+
+
 /****************** USB OTG FS PHY CONFIGURATION *******************************
 *  The USB OTG FS Core supports one on-chip Full Speed PHY.
 *  
 *  The USE_EMBEDDED_PHY symbol is defined in the project compiler preprocessor 
 *  when FS core is used.
 *******************************************************************************/
-#ifndef USE_USB_OTG_FS
- //#define USE_USB_OTG_FS
-#endif /* USE_USB_OTG_FS */
-
 #ifdef USE_USB_OTG_FS 
  #define USB_OTG_FS_CORE
 #endif
@@ -101,17 +96,6 @@
 *     Configuration (ii) need a different hardware, for more details refer to your
 *     STM32 device datasheet.
 *******************************************************************************/
-#ifndef USE_USB_OTG_HS
- //#define USE_USB_OTG_HS
-#endif /* USE_USB_OTG_HS */
-
-#ifndef USE_ULPI_PHY
- //#define USE_ULPI_PHY
-#endif /* USE_ULPI_PHY */
-
-#ifndef USE_EMBEDDED_PHY
- //#define USE_EMBEDDED_PHY
-#endif /* USE_EMBEDDED_PHY */
 
 #ifdef USE_USB_OTG_HS 
  #define USB_OTG_HS_CORE
@@ -138,7 +122,7 @@
  
 /****************** USB OTG HS CONFIGURATION **********************************/
 #ifdef USB_OTG_HS_CORE
- #define RX_FIFO_HS_SIZE                          512
+ #define RX_FIFO_HS_SIZE                          512 //516
  #define TXH_NP_HS_FIFOSIZ                        256
  #define TXH_P_HS_FIFOSIZ                         256
 
@@ -151,9 +135,11 @@
  #ifdef USE_EMBEDDED_PHY
    #define USB_OTG_EMBEDDED_PHY_ENABLED
  #endif
-// #define USB_OTG_HS_INTERNAL_DMA_ENABLED
+ 
+ 
  #define USB_OTG_EXTERNAL_VBUS_ENABLED
 // #define USB_OTG_INTERNAL_VBUS_ENABLED
+
 #endif
 
 /****************** USB OTG FS CONFIGURATION **********************************/
@@ -168,18 +154,11 @@
 
 /****************** USB OTG MODE CONFIGURATION ********************************/
 #define USE_HOST_MODE
-//#define USE_DEVICE_MODE
-//#define USE_OTG_MODE
+
 
 #ifndef USB_OTG_FS_CORE
  #ifndef USB_OTG_HS_CORE
     #error  "USB_OTG_HS_CORE or USB_OTG_FS_CORE should be defined"
- #endif
-#endif
-
-#ifndef USE_DEVICE_MODE
- #ifndef USE_HOST_MODE
-    #error  "USE_DEVICE_MODE or USE_HOST_MODE should be defined"
  #endif
 #endif
 

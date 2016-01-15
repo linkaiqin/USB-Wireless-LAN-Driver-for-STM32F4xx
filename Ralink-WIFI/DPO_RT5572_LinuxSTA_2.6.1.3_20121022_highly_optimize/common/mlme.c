@@ -358,7 +358,10 @@ VOID MlmeHandler(
 				Elem->Occupied = FALSE;
 				Elem->MsgLen = 0;
                 #ifdef MLMEQUEUE_ALLOC_INUSE    
-                kfree(Elem->Msg);
+                if(Elem->Msg) 
+                {
+                    kfree(Elem->Msg);
+                }
                 Elem->Msg = NULL;
                 #endif                  
 				continue;

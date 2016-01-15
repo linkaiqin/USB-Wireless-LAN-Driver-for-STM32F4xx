@@ -7,6 +7,7 @@
 //#include <asm/system.h>
 //#include "misc_cvt.h"
 
+#include "stdio.h"
 
 #define offset_of(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 

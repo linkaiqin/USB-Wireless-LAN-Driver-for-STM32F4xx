@@ -10,7 +10,7 @@
  * This file is released under the GPL license.
  *     Copyright (c) 1997-2007 Jean Tourrilhes <jt@hpl.hp.com>
  */
-#include "usbh_config.h"
+#include "usbh_linux.h"
 #include "os.h"
 #include "memory.h"
 #include "sockios.h"

@@ -30,7 +30,8 @@
 #define LWIP_PLATFORM_DIAG(x) printf x
 #define LWIP_DEBUG
 #define SYS_DEBUG     LWIP_DBG_ON
-//#define DHCP_DEBUG    LWIP_DBG_ON          
+// #define DHCP_DEBUG    LWIP_DBG_ON      
+//#define DNS_DEBUG    LWIP_DBG_ON  
 #define HTTPD_DEBUG   LWIP_DBG_ON
 #define MEM_DEBUG     LWIP_DBG_ON
 //#define SOCKETS_DEBUG                   LWIP_DBG_ON
@@ -42,7 +43,7 @@
 
 #define TCPIP_THREAD_NAME              "TCP/IP"
 #define TCPIP_THREAD_STACKSIZE          512
-#define TCPIP_THREAD_PRIO                14
+#define TCPIP_THREAD_PRIO                13
 #define TCPIP_MBOX_SIZE                  5
 #define DEFAULT_UDP_RECVMBOX_SIZE       5
 #define DEFAULT_TCP_RECVMBOX_SIZE       5
@@ -50,6 +51,13 @@
 #define DEFAULT_THREAD_STACKSIZE        512
 
 
+/*for ping.c.*/
+#define DEFAULT_RAW_RECVMBOX_SIZE       5
+#define LWIP_RAW                        1
+#define LWIP_SO_RCVTIMEO                1
+
+
+#define LWIP_NETIF_API        1
 
 /**
  * LWIP_NETIF_STATUS_CALLBACK==1: Support a callback function whenever an interface
@@ -85,7 +93,7 @@
 
 /* MEM_SIZE: the size of the heap memory. If the application will send
 a lot of data that needs to be copied, this should be set high. */
-#define MEM_SIZE                (26*1024)
+#define MEM_SIZE                (24*1024)
 
 /* MEMP_NUM_PBUF: the number of memp struct pbufs. If the application
    sends a lot of data out of ROM (or other static memory), this
@@ -146,6 +154,7 @@ a lot of data that needs to be copied, this should be set high. */
    turning this on does currently not work. */
 #define LWIP_DHCP               1
 #define LWIP_DNS                1
+#define DNS_DOES_NAME_CHECK     0
 #define LWIP_NETIF_HOSTNAME     1
 
 /* ---------- UDP options ---------- */

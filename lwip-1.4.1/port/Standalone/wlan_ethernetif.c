@@ -47,21 +47,23 @@
 
 #if 1 /* don't build, this is only a skeleton, see previous comment */
 
-#include "lwip/def.h"
-#include "lwip/mem.h"
-#include "lwip/pbuf.h"
-#include <lwip/stats.h>
-#include <lwip/snmp.h>
-#include "netif/etharp.h"
-#include "netif/ppp_oe.h"
+
 
 #include "os.h"
 #include "misc_cvt.h"
 #include "if.h"
 #include "iw_handler_def.h"
 #include "net_cvt.h"
+#include "bitops.h"
 
+#include "lwip/def.h"
+#include "lwip/mem.h"
+#include "lwip/pbuf.h"
+#include <lwip/stats.h>
+#include <lwip/snmp.h>
+#include "netif/etharp.h"
 
+#include "usbh_linux.h"
 
 /* Define those to better describe your network interface. */
 #define IFNAME0 'r'
@@ -122,29 +124,52 @@ low_level_init(struct netif *netif)
  *       to become availale since the stack doesn't retry to send a packet
  *       dropped because of memory failure (except for the TCP timers).
  */
-int output_nest_ctr = 0;
+
 
 static err_t
 low_level_output(struct netif *netif, struct pbuf *p)
 {
   struct pbuf *q;
   struct net_device *net_dev;
+  struct usb_device *usb_dev;
   struct sk_buff * skb;  
   unsigned char *data;
+  OS_ERR err;
   CPU_SR cpu_sr;
+
+
+  if(!netif_is_link_up(netif))
+    return ERR_IF;
   
   CPU_CRITICAL_ENTER();
   if(!_pnet_device)
   {
     CPU_CRITICAL_EXIT();
     LINK_STATS_INC(link.xmit);
-    return ERR_OK;
+    return ERR_IF;
   }
   net_dev = _pnet_device;
   net_dev->status |= NET_XIMT_RUNNING;
   CPU_CRITICAL_EXIT();
 
-//  initiate transfer();
+  
+  usb_dev = (struct usb_device *)net_dev->usb_dev;
+  //fix bug, if usb is disconnected, do not send any packets.
+  if(usb_dev->state < USB_STATE_DEFAULT)
+  {
+      CPU_CRITICAL_ENTER();
+      net_dev->status &= ~NET_XIMT_RUNNING;
+      CPU_CRITICAL_EXIT();    
+      return ERR_IF;
+  }
+
+   
+  if(test_bit(__QUEUE_STATE_XOFF, &net_dev->queue_state))
+  {
+    /*Blocking, don't send more data to driver*/ 
+    OSSemPend(&net_dev->queue_sem, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+  }
+
   
 #if ETH_PAD_SIZE
   pbuf_header(p, -ETH_PAD_SIZE); /* drop the padding word */
@@ -170,9 +195,9 @@ low_level_output(struct netif *netif, struct pbuf *p)
     memcpy(data, q->payload, q->len);
     data += q->len;
   }
-  output_nest_ctr++;
+  
   net_dev->hard_start_xmit(skb, net_dev);//  rt28xx_send_packets
-  output_nest_ctr--;
+  
 
   CPU_CRITICAL_ENTER();
   net_dev->status &= ~NET_XIMT_RUNNING;

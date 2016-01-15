@@ -6,6 +6,8 @@
 
 
 
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+
 
 
 typedef int16_t __s16;
@@ -15,6 +17,10 @@ typedef uint16_t __u16;
 typedef uint8_t __u8;
 typedef uint32_t  u_int32_t;
 
+
+typedef uint32_t  u32;
+typedef uint16_t u16;
+typedef uint8_t  u8;
 
 
 

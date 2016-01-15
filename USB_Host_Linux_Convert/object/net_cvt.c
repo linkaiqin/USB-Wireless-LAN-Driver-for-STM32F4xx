@@ -5,13 +5,27 @@
 #include "net_cvt.h"
 #include "memory.h"
 #include "string.h"
-#include "usbh_config.h"
+#include "usbh_debug.h"
 #include "errno-base.h"
+#include "bitops.h"
 #include "wlan_ethernetif.h"
+#include "lwip/netifapi.h"
+#include "lwip/dhcp.h"
+#include "rt_config.h"
+
+
+static net_monitor_function __net_monitor_function = NULL;
+
+
+void register_net_monitor_function(net_monitor_function func)
+{
+    __net_monitor_function = func;
+}
 
 
 void free_netdev(struct net_device *dev)
 {
+    
 	kfree(dev);
 }
 
@@ -19,6 +33,7 @@ void free_netdev(struct net_device *dev)
 struct net_device *alloc_etherdev(int sizeof_priv)
 {
     struct net_device *dev;
+    OS_ERR err;
 	int alloc_size;
 
 	/* ensure 32-byte alignment of the private area */
@@ -37,6 +52,7 @@ struct net_device *alloc_etherdev(int sizeof_priv)
 	if (sizeof_priv)
 		dev->ml_priv = (void *)(((long)(dev + 1) + 31) & ~31);
 
+    OSSemCreate(&dev->queue_sem, "net dev queue sem", 0, &err);
 //	setup(dev);
 	strcpy(dev->name, "");
 
@@ -92,7 +108,9 @@ int netif_rx(struct sk_buff *skb);
  */
 void netif_start_queue(struct net_device *dev)
 {
-//    clear_bit(__QUEUE_STATE_XOFF, &dev_queue->state);
+//    printf("netif_start_queue\r\n");
+    
+    clear_bit(__QUEUE_STATE_XOFF, &dev->queue_state);
     
 //	netif_tx_start_queue(netdev_get_tx_queue(dev, 0));
 }
@@ -106,9 +124,13 @@ void netif_start_queue(struct net_device *dev)
  */
 void netif_stop_queue(struct net_device *dev)
 {
-//   set_bit(__QUEUE_STATE_XOFF, &dev_queue->state);
+    OS_ERR err;
 
-   
+//    printf("netif_stop_queue\r\n");
+    OSSchedLock(&err);
+    set_bit(__QUEUE_STATE_XOFF, &dev->queue_state);
+    OSSemSet(&dev->queue_sem, 0, &err);
+    OSSchedUnlock(&err);
 //	netif_tx_stop_queue(netdev_get_tx_queue(dev, 0));
 }
 
@@ -126,10 +148,15 @@ void netif_stop_queue(struct net_device *dev)
  */
 void netif_wake_queue(struct net_device *dev)
 {
-//    	if (test_and_clear_bit(__QUEUE_STATE_XOFF, &dev_queue->state))
-//		__netif_schedule(dev_queue->qdisc);
+    OS_ERR err;
 
-        
+//    printf("netif_wake_queue\r\n");
+	if (test_and_clear_bit(__QUEUE_STATE_XOFF, &dev->queue_state))
+	{
+//        printf("netif_wake_queue OSSemPost\r\n");
+	    OSSemPost(&dev->queue_sem, OS_OPT_POST_1, &err);
+	}
+
 //	netif_tx_wake_queue(netdev_get_tx_queue(dev, 0));
 }
 
@@ -166,6 +193,7 @@ void netif_carrier_off(struct net_device *dev)
 //	}
 }
 
+
 struct net_device *_pnet_device = NULL;
 extern struct netif wireless_netif;
 
@@ -177,7 +205,7 @@ int register_netdev(struct net_device *dev)
     dev->netif = &wireless_netif;
     dev->dev_addr = wireless_netif.hwaddr;   
     dev->status = 0;
-
+   
 //    netif_set_link_up(&wireless_netif);
 //    netif_set_up(&wireless_netif);
         
@@ -195,8 +223,9 @@ void unregister_netdev(struct net_device *dev)
 		USBH_DBG("unregister_netdevice: device %s/%p never "
 				  "was registered\r\n", dev->name, dev);
 
-		WARN_ON(1);
-		return;
+// 		WARN_ON(1);
+        BUG_ON(1);
+// 		return;
 	}
 
 	BUG_ON(dev->reg_state != NETREG_REGISTERED);
@@ -208,8 +237,10 @@ void unregister_netdev(struct net_device *dev)
 
 	dev->reg_state = NETREG_UNREGISTERING;  
 
-
-//    netif_set_link_down(&wireless_netif);
+    netifapi_netif_common(&wireless_netif, netif_set_link_down, NULL); 
+#if LWIP_DHCP
+    netifapi_netif_common(&wireless_netif, dhcp_cleanup, NULL);
+#endif     
 //    netif_set_down(&wireless_netif);
 
     CPU_CRITICAL_ENTER();
@@ -225,15 +256,25 @@ void unregister_netdev(struct net_device *dev)
 }
 
 
-
 int netif_rx(struct sk_buff *skb)
 {
-
+    RTMP_ADAPTER *pAd;
 //    USBH_TRACE("netif_rx len:%d  pkt_type:%d  protocol:%d\r\n",skb->len, skb->pkt_type, htons(skb->protocol));
 
-
     skb_push(skb, ETH_HLEN);
-    wlan_ethernetif_input(skb->dev->netif, skb->data, skb->len);
+
+    GET_PAD_FROM_NET_DEV(pAd, skb->dev);
+    if(pAd && MONITOR_ON(pAd))
+    {
+        if(__net_monitor_function)
+            __net_monitor_function(skb->data + sizeof(wlan_ng_prism2_header), 
+                                                skb->len - sizeof(wlan_ng_prism2_header));            
+    }
+    else
+    {
+        wlan_ethernetif_input(skb->dev->netif, skb->data, skb->len);        
+    }
+    
     
     dev_kfree_skb_any(skb);
     return 0;
@@ -245,6 +286,7 @@ int netif_rx(struct sk_buff *skb)
 
 
 unsigned int skbTotalCtr = 0;
+unsigned int skbTotalMax = 0;
 
 struct sk_buff *__dev_alloc_skb(unsigned int size,gfp_t gfp_mask)
 {
@@ -258,7 +300,7 @@ struct sk_buff *__dev_alloc_skb(unsigned int size,gfp_t gfp_mask)
         return NULL;
     }
 
-    size = SKB_DATA_ALIGN(size);
+    size = SKB_DATA_ALIGN(size);  
     data = kmalloc(size ,0);
     if(!data)
     {
@@ -266,8 +308,17 @@ struct sk_buff *__dev_alloc_skb(unsigned int size,gfp_t gfp_mask)
         kfree(skb);
         return NULL;
     }
+
+    if(size == 28)
+    {
+        size = size;
+    }
     
     skbTotalCtr++;
+    if(skbTotalCtr > skbTotalMax)
+    {
+        skbTotalMax = skbTotalCtr;
+    }
     
     skb->truesize = size + sizeof(struct sk_buff);
     skb->len = 0;
@@ -442,7 +493,7 @@ int pskb_expand_head(struct sk_buff *skb, int nhead, int ntail,
 	int size = nhead + (skb->end - skb->head) + ntail;
 	long off;
 
-    USBH_TRACE("pskb_expand_head handler\r\n");
+//    USBH_TRACE("pskb_expand_head handler\r\n");
 	BUG_ON(nhead < 0);
 
 

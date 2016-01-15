@@ -1,10 +1,11 @@
 #define USBH_DEBUG_LEVEL USBH_DEBUG_TRACE
 #include "os.h"
-#include "usbh_config.h"
+#include "usbh_debug.h"
 #include "errno.h"
 #include "sem.h"
 #include "kthread.h"
 #include "misc_cvt.h"
+
 
 
 unsigned int SemaTotalCtr = 0;
@@ -18,6 +19,12 @@ void _sema_init(char *name, struct semaphore *sem, int val)
 
     CPU_CRITICAL_ENTER();
     SemaTotalCtr++;
+#if OS_CFG_DBG_EN > 0u   
+    //The procedure _sema_init()-->OSSemCreate()-->OS_SemDbgListAdd() is dangerous,
+    //because some linux driver don't call sema_destroy(), the semaphore instance will
+    //still exsit in OSSemDbgListPtr after freed. Alway set OSSemDbgListPtr to zero.
+    OSSemDbgListPtr = NULL;
+#endif
     CPU_CRITICAL_EXIT();
 
     OSSemCreate(&sem->p_os_sem, name, val, &err);
@@ -70,7 +77,7 @@ void _up(struct semaphore *sem)
     OSSemPost(&sem->p_os_sem, OS_OPT_POST_1, &err);
 
     if(err != OS_ERR_NONE){
-        USBH_DBG("_up OSSemPend Failed %d\r\n",err);
+        USBH_DBG("_up OSSemPost Failed %d\r\n",err);
     }
 }
 
@@ -129,8 +136,27 @@ int down_trylock(struct semaphore *sem)
 }
 
 
-
-
+/**
+ * down - acquire the semaphore
+ * @sem: the semaphore to be acquired
+ *
+ * Acquires the semaphore.  If no more tasks are allowed to acquire the
+ * semaphore, calling this function will put the task to sleep until the
+ * semaphore is released.
+ *
+ * Use of this function is deprecated, please use down_interruptible() or
+ * down_killable() instead.
+ */
+void down(struct semaphore *sem)
+{
+    OS_ERR err;
+    
+    OSSemPend(&sem->p_os_sem,0,OS_OPT_PEND_BLOCKING,0, &err);
+    if(err != OS_ERR_NONE)
+    {
+        USBH_DBG("down OSSemPend Failed %d\r\n",err);
+    }
+}
 
 
 

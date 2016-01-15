@@ -11,7 +11,11 @@ extern "C" {
 #define GFP_KERNEL  1 
 #define GFP_ATOMIC   2
 
-
+    
+//Merge lwip malloc function with USB_Linux_Convert malloc funtion.This macro option 
+//will decrease the usage of memory.
+//NOTE:If this option is defined, you should not complie the file mem.c of lwip, since 
+//     USB_Linux_Convert malloc is modified to non-blocking, but lwip malloc is not.      
 #define USE_LWIP_MALLOC
 
 
@@ -21,7 +25,7 @@ extern "C" {
 
 #ifndef USE_LWIP_MALLOC
 
-#define USBH_MEM_SIZE                (24*1024)
+#define USBH_MEM_SIZE                (90*1024)//(34*1024)
 #define USBH_MEM_DEBUG                       1
 #define USBH_MEM_USE_POOLS                   0
 
@@ -66,18 +70,19 @@ void *usbh_mem_realloc(void *ptr, usbh_mem_size_t size);
 static inline void* usbh_mem_malloc_dbg(usbh_mem_size_t size,const char* func)
 {
     void* mem;
-    if(size > 500)
-    {
-     printf("kmalloc size:%ld in %s\r\n ",size,func);
-    }
+
     mem = usbh_mem_malloc(size);
+    if(size > 200)
+    {
+     printf("kmalloc:%p size:%ld in %s\r\n ",mem,size,func);
+    }
 //    printf("mem:%p\r\n",mem);
     return mem;
 }
 static inline void* usbh_mem_calloc_dbg(usbh_mem_size_t count, usbh_mem_size_t size,const char* func)
 {
     void* mem;    
-//    printf("kcalloc size:%ld in %s\r\n",count*size,func);
+    printf("kcalloc size:%ld in %s\r\n",count*size,func);
     mem = usbh_mem_calloc(count,size);   
 //    printf("mem:%p\r\n",mem);
     return mem;
@@ -85,12 +90,13 @@ static inline void* usbh_mem_calloc_dbg(usbh_mem_size_t count, usbh_mem_size_t s
 
 static inline void  usbh_mem_free_dbg(void *mem,const char* func)
 {
-//    printf("kfree mem:%p in %s\r\n",mem,func);
+    printf("kfree mem:%p in %s\r\n",mem,func);
     return usbh_mem_free(mem);
 }
 
 
 //#define kmalloc(size,flags)     usbh_mem_malloc_dbg(size,__FUNCTION__)
+// #define kzalloc(size,flags)   usbh_mem_calloc_dbg(1,size,__FUNCTION__)
 // #define kcalloc(n,size,flags)   usbh_mem_calloc_dbg(n,size,__FUNCTION__)
 // #define vmalloc(size)           usbh_mem_malloc_dbg(size,__FUNCTION__)
 
@@ -101,6 +107,7 @@ static inline void  usbh_mem_free_dbg(void *mem,const char* func)
 
 
 #define kmalloc(size,flags)     usbh_mem_malloc(size)
+#define kzalloc(size,flags)   usbh_mem_calloc(1,size)
 #define kcalloc(n,size,flags)   usbh_mem_calloc(n,size)
 #define vmalloc(size)           usbh_mem_malloc(size)
 #define krealloc(size)     usbh_mem_realloc(size)
@@ -164,14 +171,15 @@ void *mem_realloc(void *ptr, mem_size_t size);
 
 
 
-#define kmalloc(size,flags)     mem_malloc(size)
+#define kmalloc(size,flags)     mem_malloc(size)   //none blocking
+#define kzalloc(size,flags)   mem_calloc(1,size)
 #define kcalloc(n,size,flags)   mem_calloc(n,size)
 #define vmalloc(size)           mem_malloc(size)
 #define krealloc(size)          mem_realloc(size)
 
 
 
-#define kfree(mem)              mem_free(mem)
+#define kfree(mem)              mem_free(mem)  //none blocking
 #define vfree(mem)		        mem_free(mem)
 
 

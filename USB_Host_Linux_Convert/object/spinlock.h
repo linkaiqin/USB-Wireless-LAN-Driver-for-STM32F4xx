@@ -1,7 +1,7 @@
 #ifndef _SPINLOCK_H
 #define _SPINLOCK_H
 
-#include "usbh_config.h"
+#include "usbh_debug.h"
 #include "cpu_cfg.h"
 
 
